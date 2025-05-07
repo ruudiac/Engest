@@ -1,12 +1,15 @@
 import SwiftUI
 import UIKit
 import AVFoundation
+import Firebase
+
 
 struct Dashboard: View {
     @State private var showingImagePicker = false
     @State private var showPhotoOptions = false
     @State private var selectedImage: UIImage? = nil
     @State private var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    @AppStorage("username") private var username: String = ""
     
     @State private var isRecording = false
     @State private var audioRecorder: AVAudioRecorder?
@@ -18,91 +21,122 @@ struct Dashboard: View {
     var audioSession = AVAudioSession.sharedInstance()
 
     var body: some View {
-        VStack {
-            // MARK: - Profile Image Section
-            if let image = selectedImage {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 200)
-                    .clipShape(Circle())
-                    .padding()
-            } else {
-                Image(systemName: "person.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 100)
-                    .clipShape(Circle())
-                    .padding()
-            }
-
-            Button("Change Profile Picture") {
-                showPhotoOptions = true
-            }
-            .padding()
-            .background(Color.white)
-            .cornerRadius(10)
-            
-            // MARK: - Waveform
-            HStack(alignment: .center, spacing: 2) {
-                ForEach(audioLevels, id: \.self) { level in
-                    Capsule()
-                        .fill(Color.white)
-                        .frame(width: 3, height: CGFloat(level) * 100)
-                }
-            }
-            .frame(height: 100)
-            .padding(.top, 10)
-
-            // MARK: - Audio Recording Section
-            Button(isRecording ? "Stop Recording" : "Start Recording") {
-                if isRecording {
-                    stopRecording()
+        NavigationStack{
+            VStack {
+                // MARK: - Profile Image Section
+                if let image = selectedImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 200, height: 200)
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .stroke(Color(red: 161/255, green: 85/255, blue: 203/255),
+                                lineWidth: 4
+                        ))
+                        .padding()
                 } else {
-                    startRecording()
+                    Image(systemName: "person.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width:100, height: 100)
+                        .padding(30)
+                        .background(Color.gray.opacity(0.2))
+                        .clipShape(Circle())
+                        .padding()
                 }
-            }
-            .padding()
-            .background(isRecording ? Color.red : Color.purple)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-
-            if fileURL != nil {
-                Button("Play Recording") {
-                    playRecording()
+                
+                Text("@\(username.isEmpty ? "user" : username)")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(Color(red: 161/255, green: 85/255, blue: 203/255))
+                    .padding(.top, 8)
+                
+                Button("Change Profile Picture") {
+                    showPhotoOptions = true
                 }
                 .padding()
-                .background(Color.green)
+                .frame(maxWidth: .infinity)
+                .background(Color(red: 161/255, green: 85/255, blue: 203/255))
                 .foregroundColor(.white)
-                .cornerRadius(10)
-
-                Text("Saved to: \(fileURL!.lastPathComponent)")
-                    .font(.caption)
+                .cornerRadius(25)
+                .padding(.top, 20)
+                
+                // MARK: - Waveform
+                HStack(alignment: .center, spacing: 2) {
+                    ForEach(audioLevels, id: \.self) { level in
+                        Capsule()
+                            .fill(Color.white)
+                            .frame(width: 3, height: CGFloat(level) * 100)
+                    }
+                }
+                .frame(height: 100)
+                .padding(.top, 10)
+                
+                // MARK: - Audio Recording Section
+                Button(isRecording ? "Stop recording" : "Start recording") {
+                    if isRecording {
+                        stopRecording()
+                    } else {
+                        startRecording()
+                    }
+                }
+                .padding()
+                .background(isRecording ? Color.red : Color(red: 161/255, green: 85/255, blue: 203/255))
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .cornerRadius(25)
+                .padding(.top,20)
+                
+                if fileURL != nil {
+                    Button("Play Recording") {
+                        playRecording()
+                    }
+                    .padding()
+                    .background(Color.green)
                     .foregroundColor(.white)
-                    .padding(.top, 5)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top,20)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                    
+                    Text("Saved to: \(fileURL!.lastPathComponent)")
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .padding(.top, 5)
+                }
+                NavigationLink(destination: SettingsView()) {
+                    Text("Settings")
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(red: 161/255, green: 85/255, blue: 203/255))
+                        .foregroundColor(.white)
+                        .cornerRadius(40)
+                    }
+                        .padding(.top, 20)
             }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(red: 0.796, green: 0.667, blue: 0.871))
-        .ignoresSafeArea()
-        .onAppear {
-            setupAudioSession()
-        }
-        .confirmationDialog("Select Photo Option", isPresented: $showPhotoOptions) {
-            if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                Button("Take Photo") {
-                    sourceType = .camera
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(red: 0.796, green: 0.667, blue: 0.871))
+            .ignoresSafeArea()
+            .onAppear {
+                setupAudioSession()
+            }
+            .confirmationDialog("Select Photo Option", isPresented: $showPhotoOptions) {
+                if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                    Button("Take Photo") {
+                        sourceType = .camera
+                        showingImagePicker = true
+                    }
+                }
+                Button("Choose from Library") {
+                    sourceType = .photoLibrary
                     showingImagePicker = true
                 }
+                Button("Cancel", role: .cancel) {}
             }
-            Button("Choose from Library") {
-                sourceType = .photoLibrary
-                showingImagePicker = true
+            .sheet(isPresented: $showingImagePicker) {
+                ImagePicker(image: $selectedImage, sourceType: sourceType)
             }
-            Button("Cancel", role: .cancel) {}
-        }
-        .sheet(isPresented: $showingImagePicker) {
-            ImagePicker(image: $selectedImage, sourceType: sourceType)
         }
     }
 

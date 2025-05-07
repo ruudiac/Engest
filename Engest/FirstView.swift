@@ -6,25 +6,41 @@
 // Sign up
 
 import SwiftUI
+import Firebase
 
 struct FirstView: View {
-    @State private var textInput = ""
-    @State private var textinput = ""
+    @AppStorage("username") private var username: String = ""
+    @AppStorage("email") private var email: String = ""
+    @AppStorage("password") private var password: String = ""
+
+    
     var body: some View {
         
             VStack {
+                Text("Welcome, \(username.isEmpty ? "Guest" : username)!")
+                    .font(.largeTitle)
+                    .padding(.bottom, 20)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+
+                
                 Text("Sign Up")
                     .font(.largeTitle)
                     .padding(.bottom,20)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                 
-                TextField("Email", text:$textInput)
+                TextField("Username", text:$username)
                     .textFieldStyle(.roundedBorder)
                     .padding()
                     .frame(width: 250)
                 
-                TextField("Password", text:$textinput)
+                TextField("Email", text:$email)
+                    .textFieldStyle(.roundedBorder)
+                    .padding()
+                    .frame(width: 250)
+                
+                TextField("Password", text:$password)
                     .textFieldStyle(.roundedBorder)
                     .padding()
                     .frame(width: 250)

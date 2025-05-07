@@ -6,8 +6,15 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct ContentView: View {
+    
+    init() {
+        FirebaseApp.configure()
+        print("Configured Firebase")
+    }
+    
     var body: some View {
         NavigationView {
             VStack {

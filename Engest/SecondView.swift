@@ -7,44 +7,54 @@
 
 import SwiftUI
 
+final class SignInEmailViewModel: ObservableObject {
+    
+    @Published var email = ""
+    @Published var password = ""
+    
+}
+
 struct SecondView: View {
-    @State private var textInput = ""
-    @State private var textinput = ""
+    
+    @StateObject private var viewModel = SignInEmailViewModel()
+    
+    
     var body: some View {
+        NavigationStack {
+            
             VStack {
-                Text("Log in")
-                    .font(.largeTitle)
-                    .padding(.bottom,20)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
                 
-                TextField("Email", text:$textInput)
+                
+                TextField("Email:", text: $viewModel.email)
                     .textFieldStyle(.roundedBorder)
                     .padding()
                     .frame(width: 250)
+                    .cornerRadius(40)
                 
-                TextField("Password", text:$textinput)
+                SecureField("Password:", text: $viewModel.password)
                     .textFieldStyle(.roundedBorder)
                     .padding()
                     .frame(width: 250)
+                    .cornerRadius(40)
                 
-                NavigationLink(destination: Dashboard()) {
-                    Text("Log In")
+                Button{
+                    
+                } label: {
+                    Text("Sign In")
                         .padding()
-                        .frame(width:150, height: 50)
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
                         .background(Color(red: 161/255, green: 85/255, blue: 203/255))
                         .foregroundColor(.white)
                         .cornerRadius(40)
                 }
-                
-        
+                Spacer()
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(red: 0.796, green: 0.667, blue: 0.871))
-            .ignoresSafeArea()
+            .padding()
+            .navigationTitle("Sign In with Email")
         }
     }
-
+}
 
 #Preview {
     SecondView()
