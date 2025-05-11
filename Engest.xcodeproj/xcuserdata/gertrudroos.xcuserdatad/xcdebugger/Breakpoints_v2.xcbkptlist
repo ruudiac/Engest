@@ -14,13 +14,13 @@
             filePath = "Engest/Preview Content/Authentication /SignInEmailView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "34"
-            endingLineNumber = "34"
+            startingLineNumber = "41"
+            endingLineNumber = "41"
             landmarkName = "body"
             landmarkType = "24">
             <Locations>
                <Location
-                  uuid = "F909D2C7-0C1C-4E1D-9A7F-E914A914A421 - 6427a4d7dbe9815b"
+                  uuid = "F909D2C7-0C1C-4E1D-9A7F-E914A914A421 - 6427a4d7dbe9fe84"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -30,11 +30,11 @@
                   urlString = "file:///Users/gertrudroos/Documents/Mobiilirakendused/ENGEST/Engest/Engest/Preview%20Content/Authentication%20/SignInEmailView.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "40"
-                  endingLineNumber = "40">
+                  startingLineNumber = "41"
+                  endingLineNumber = "41">
                </Location>
                <Location
-                  uuid = "F909D2C7-0C1C-4E1D-9A7F-E914A914A421 - cfe7328a55926d1c"
+                  uuid = "F909D2C7-0C1C-4E1D-9A7F-E914A914A421 - cfe7328a559212c3"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -44,8 +44,8 @@
                   urlString = "file:///Users/gertrudroos/Documents/Mobiilirakendused/ENGEST/Engest/Engest/Preview%20Content/Authentication%20/SignInEmailView.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "40"
-                  endingLineNumber = "40">
+                  startingLineNumber = "41"
+                  endingLineNumber = "41">
                </Location>
             </Locations>
          </BreakpointContent>
