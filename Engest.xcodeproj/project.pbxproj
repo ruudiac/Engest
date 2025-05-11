@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BD3D310C2DC80C6100451240 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = BD3D310B2DC80C6100451240 /* FirebaseAnalytics */; };
+		BD3D310E2DC80C6100451240 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = BD3D310D2DC80C6100451240 /* FirebaseAuth */; };
+		BD3D31102DC80C6100451240 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = BD3D310F2DC80C6100451240 /* FirebaseDatabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		BD6FA1972D98A2FF00F53EB4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BD2140ED2DCFF53F00BEAB0D /* Engest.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Engest.xcodeproj; sourceTree = "<group>"; };
 		BD6FA1862D98A2FE00F53EB4 /* Engest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Engest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD6FA1962D98A2FF00F53EB4 /* EngestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EngestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD6FA1A02D98A30000F53EB4 /* EngestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EngestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +59,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BD3D31102DC80C6100451240 /* FirebaseDatabase in Frameworks */,
+				BD3D310C2DC80C6100451240 /* FirebaseAnalytics in Frameworks */,
+				BD3D310E2DC80C6100451240 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,6 +82,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BD2140F32DCFF53F00BEAB0D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		BD6FA17D2D98A2FE00F53EB4 = {
 			isa = PBXGroup;
 			children = (
@@ -189,9 +206,18 @@
 			);
 			mainGroup = BD6FA17D2D98A2FE00F53EB4;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BD3D310A2DC80C6100451240 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BD6FA1872D98A2FE00F53EB4 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = BD2140F32DCFF53F00BEAB0D /* Products */;
+					ProjectRef = BD2140ED2DCFF53F00BEAB0D /* Engest.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				BD6FA1852D98A2FE00F53EB4 /* Engest */,
@@ -556,6 +582,35 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BD3D310A2DC80C6100451240 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BD3D310B2DC80C6100451240 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BD3D310A2DC80C6100451240 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		BD3D310D2DC80C6100451240 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BD3D310A2DC80C6100451240 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		BD3D310F2DC80C6100451240 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BD3D310A2DC80C6100451240 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BD6FA17E2D98A2FE00F53EB4 /* Project object */;
 }
