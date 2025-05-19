@@ -7,9 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BD38646C2DDB8A3800DEBD0A /* GreetingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD38646B2DDB8A3800DEBD0A /* GreetingsView.swift */; };
+		BD38646E2DDB8D6D00DEBD0A /* CardFace.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD38646D2DDB8D6C00DEBD0A /* CardFace.swift */; };
+		BD3864702DDB918C00DEBD0A /* NumbersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD38646F2DDB918C00DEBD0A /* NumbersView.swift */; };
+		BD3864742DDB997800DEBD0A /* Caprasimo-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BD3864732DDB997800DEBD0A /* Caprasimo-Regular.ttf */; };
+		BD38647A2DDB9DDE00DEBD0A /* ColorHex.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3864792DDB9DDE00DEBD0A /* ColorHex.swift */; };
+		BD38647C2DDBB56A00DEBD0A /* SettingsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD38647B2DDBB56A00DEBD0A /* SettingsButton.swift */; };
 		BD3D310C2DC80C6100451240 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = BD3D310B2DC80C6100451240 /* FirebaseAnalytics */; };
 		BD3D310E2DC80C6100451240 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = BD3D310D2DC80C6100451240 /* FirebaseAuth */; };
 		BD3D31102DC80C6100451240 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = BD3D310F2DC80C6100451240 /* FirebaseDatabase */; };
+		BDEBD8602DD26E1E00A51ABF /* FlashcardData.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDEBD85F2DD26E1E00A51ABF /* FlashcardData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,14 +37,35 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BD2140ED2DCFF53F00BEAB0D /* Engest.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Engest.xcodeproj; sourceTree = "<group>"; };
+		BD38646B2DDB8A3800DEBD0A /* GreetingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreetingsView.swift; sourceTree = "<group>"; };
+		BD38646D2DDB8D6C00DEBD0A /* CardFace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardFace.swift; sourceTree = "<group>"; };
+		BD38646F2DDB918C00DEBD0A /* NumbersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumbersView.swift; sourceTree = "<group>"; };
+		BD3864732DDB997800DEBD0A /* Caprasimo-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Caprasimo-Regular.ttf"; sourceTree = "<group>"; };
+		BD3864792DDB9DDE00DEBD0A /* ColorHex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHex.swift; sourceTree = "<group>"; };
+		BD38647B2DDBB56A00DEBD0A /* SettingsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsButton.swift; sourceTree = "<group>"; };
 		BD6FA1862D98A2FE00F53EB4 /* Engest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Engest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD6FA1962D98A2FF00F53EB4 /* EngestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EngestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BD6FA1A02D98A30000F53EB4 /* EngestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EngestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BDEBD85F2DD26E1E00A51ABF /* FlashcardData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlashcardData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BD3864782DDB99F300DEBD0A /* Exceptions for "Engest" folder in "Engest" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = BD6FA1852D98A2FE00F53EB4 /* Engest */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		BD6FA1882D98A2FE00F53EB4 /* Engest */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BD3864782DDB99F300DEBD0A /* Exceptions for "Engest" folder in "Engest" target */,
+			);
 			path = Engest;
 			sourceTree = "<group>";
 		};
@@ -81,9 +109,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BD2140F32DCFF53F00BEAB0D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		BD6FA17D2D98A2FE00F53EB4 = {
 			isa = PBXGroup;
 			children = (
+				BD38647B2DDBB56A00DEBD0A /* SettingsButton.swift */,
+				BD3864732DDB997800DEBD0A /* Caprasimo-Regular.ttf */,
+				BD38646F2DDB918C00DEBD0A /* NumbersView.swift */,
+				BD38646D2DDB8D6C00DEBD0A /* CardFace.swift */,
+				BD38646B2DDB8A3800DEBD0A /* GreetingsView.swift */,
+				BD3864792DDB9DDE00DEBD0A /* ColorHex.swift */,
+				BDEBD85F2DD26E1E00A51ABF /* FlashcardData.swift */,
 				BD6FA1882D98A2FE00F53EB4 /* Engest */,
 				BD6FA1992D98A2FF00F53EB4 /* EngestTests */,
 				BD6FA1A32D98A30000F53EB4 /* EngestUITests */,
@@ -204,6 +246,12 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BD6FA1872D98A2FE00F53EB4 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = BD2140F32DCFF53F00BEAB0D /* Products */;
+					ProjectRef = BD2140ED2DCFF53F00BEAB0D /* Engest.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				BD6FA1852D98A2FE00F53EB4 /* Engest */,
@@ -218,6 +266,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BD3864742DDB997800DEBD0A /* Caprasimo-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,6 +291,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BD3864702DDB918C00DEBD0A /* NumbersView.swift in Sources */,
+				BD38646E2DDB8D6D00DEBD0A /* CardFace.swift in Sources */,
+				BD38647A2DDB9DDE00DEBD0A /* ColorHex.swift in Sources */,
+				BD38647C2DDBB56A00DEBD0A /* SettingsButton.swift in Sources */,
+				BD38646C2DDB8A3800DEBD0A /* GreetingsView.swift in Sources */,
+				BDEBD8602DD26E1E00A51ABF /* FlashcardData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -406,6 +461,8 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Engest/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Engest/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Please allow Engest access to the camera";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Please allow Engest access to the microphone";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Please allow Engest access to the photo library";
@@ -414,7 +471,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -438,6 +495,8 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Engest/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Engest/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Please allow Engest access to the camera";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Please allow Engest access to the microphone";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Please allow Engest access to the photo library";
@@ -446,7 +505,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
