@@ -4,14 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Foundation from '@expo/vector-icons/Foundation';
 import { lessonsData } from '../app/data/lessons';
-
+import React, { useState, useEffect, useRef } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 
 export default function Module() {
   const { id, name } = useLocalSearchParams(); 
   const lessons = (lessonsData as any)[Number(id)] ?? [];
-
-
+  const [completedCount, setCompletedCount] = useState(0)
 
 const inputStyle = {
   shadowColor: '#7F39A6',
@@ -20,12 +20,25 @@ const inputStyle = {
   shadowRadius: 4,
   elevation: 4,
 }
+useEffect(() => {
+  const loadCompleted = async () => {
+    let count = 0
+    for (const lesson of lessons) {
+      const result = await AsyncStorage.getItem(`completed_${id}_${lesson.id}`)
+      if (result === 'true') {
+        count = count + 1
+      }
+    }
+    setCompletedCount(count)
+  }
+  loadCompleted()
+}, [])
  
 
 return (
     <SafeAreaView className="flex-1 bg-[#EAD4F6] px-6">
       <View className="flex-row items-center justify-between w-full">
-        <Pressable onPress={ () => router.back()} className="flex-row items-center  rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2 mr-2 " style={{ ...inputStyle }}>
+        <Pressable onPress={ () => router.push('/dashboard')} className="flex-row items-center  rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2 mr-2 " style={{ ...inputStyle }}>
         <Ionicons name="caret-back" size={24} color="#7F39A6" /></Pressable>
 
       <View className="flex-row mt-3 items-center justify-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2" style={{ width: 110, ...inputStyle }}>
@@ -42,7 +55,7 @@ return (
         <Text className='text-center font-pixel mt-3 text-xl'>Completed</Text>
       </View>
       <View className='w-full h-5 border border-[#543666] bg-[#CF8DF5] rounded-full mt-2 overflow-hidden'>
-    <View style={{width: `${0.5 * 100}%`}} className="h-5 bg-[#7F39A6]"> 
+    <View style={{width: `${(completedCount / lessons.length)*100}%`}} className="h-5 bg-[#7F39A6]"> 
     </View>
   </View>
   <FlatList

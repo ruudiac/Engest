@@ -1,24 +1,46 @@
+const estonianLetterNames: Record<string, string> = {
+  'A': 'aa', 'B': 'bee', 'C': 'tsee', 'D': 'dee', 'E': 'ee',
+  'F': 'eff', 'G': 'gee', 'H': 'haa', 'I': 'ii', 'J': 'jott',
+  'K': 'kaa', 'L': 'ell', 'M': 'emm', 'N': 'enn', 'O': 'oo',
+  'P': 'pee', 'Q': 'kuu', 'R': 'err', 'S': 'ess', 'Š': 'šaa',
+  'Z': 'zett', 'Ž': 'žee', 'T': 'tee', 'U': 'uu', 'V': 'vee',
+  'W': 'kaksisvee', 'Õ': 'õõ', 'Ä': 'ää', 'Ö': 'öö', 'Ü': 'üü',
+  'X': 'iks', 'Y': 'igrek'
+}
+
 export const lessonsData = {
   1: [
     { id: 1, 
-      name: 'Tähed', 
-      subtitle: 'Letters',   
+      name: 'Tähed 1', 
+      subtitle: 'Letters 1',   
       icon: require('../../assets/images/A.png'),
       icon2: require('../../assets/images/O.png')},
 
     { id: 2, 
+      name: 'Tähed 2', 
+      subtitle: 'Letters 2',   
+      icon: require('../../assets/images/A.png'),
+      icon2: require('../../assets/images/O.png')},
+
+    { id: 3, 
+      name: 'Tähed 3', 
+      subtitle: 'Letters 3',   
+      icon: require('../../assets/images/A.png'),
+      icon2: require('../../assets/images/O.png')},
+
+    { id: 4, 
       name: 'Tervitused', 
       subtitle: 'Greetings', 
       icon2: require('../../assets/images/kasi1.png'),
       icon: require('../../assets/images/kasi2.png')
      },
 
-    { id: 3,
+    { id: 5,
       name: 'Nädalapäevad', 
       subtitle: 'Days of the week', 
       icon2: require('../../assets/images/kalender.png') },
 
-    { id: 4, 
+    { id: 6, 
       name: 'Ilm', 
       subtitle: 'Weather', 
       icon: require('../../assets/images/paike.png'),
@@ -144,8 +166,8 @@ export const lessonsData = {
 
       { id: 4,
         letter: 'D',
-        word: 'Dinosaurus',
-        translation: 'Dinosaur',},
+        word: 'Diivan',
+        translation: 'Couch',},
 
       { id: 5,
         letter: 'E',
@@ -154,13 +176,13 @@ export const lessonsData = {
 
       { id: 6,
         letter: 'F',
-        word: 'Flamingo',
-        translation: 'Flamingo',},
+        word: 'Foto',
+        translation: 'Photo',},
 
       { id: 7,
         letter: 'G',
-        word: 'Gloobus',
-        translation: 'Globe',},
+        word: 'Gümnaasium',
+        translation: 'gymnasium',},
 
       { id: 8,
         letter: 'H',
@@ -176,7 +198,9 @@ export const lessonsData = {
         letter: 'J',
         word: 'Jänes',
         translation: 'Rabbit',},
-
+    ],
+  
+    2:[
       { id: 11,
         letter: 'K',
         word: 'Kass',
@@ -204,8 +228,8 @@ export const lessonsData = {
 
       { id: 16,
         letter:'P',
-        word:'Pall',
-        translation:'Ball',},
+        word:'Päike',
+        translation:'The sun',},
 
       { id: 17,
         letter:'Q',
@@ -225,67 +249,70 @@ export const lessonsData = {
       { id: 20,
         letter:'š',
         word:'šokolaad',
-        translation:'Chocolate',},
+        translation:'Chocolate',}
+    ],
 
-      { id: 21,
-        letter:'Z',
-        word:'Zoo',
-        translation:'Zoo',},
+  3: [
+    { id: 21,
+      letter:'Z',
+      word:'Zoo',
+      translation:'Zoo',},
 
-      { id: 22,
-        letter: 'ž',
-        word: 'žürii',
-        translation: 'Jury',},
+    { id: 22,
+      letter: 'ž',
+      word: 'žürii',
+      translation: 'Jury',},
 
-      { id: 23,
-        letter:'T',
-        word:'Tramm',
-        translation:'Tram',},
+    { id: 23,
+      letter:'T',
+      word:'Tramm',
+      translation:'Tram',},
 
-      { id: 24,
-        letter:'U',
-        word:'Uks',
-        translation:'Door',},
+    { id: 24,
+      letter:'U',
+      word:'Uks',
+      translation:'Door',},
 
-      { id: 25,
-        letter:'V',
-        word:'Vihm',
-        translation:'Rain',},
+    { id: 25,
+      letter:'V',
+      word:'Vihm',
+      translation:'Rain',},
 
-      { id: 26,
-        letter:'õ',
-        word:'õun',
-        translation:'Apple',},
+    { id: 26,
+      letter:'õ',
+      word:'õun',
+      translation:'Apple',},
 
-      { id: 27,
-        letter:'ä',
-        word:'ämblik',
-        translation:'Spider',},
+    { id: 27,
+      letter:'ä',
+      word:'ämblik',
+      translation:'Spider',},
 
-      { id: 28,
-        letter:'ö',
-        word:'öökull',
-        translation:'Owl',},
+    { id: 28,
+      letter:'ö',
+      word:'öökull',
+      translation:'Owl',},
 
-      { id: 29,
-        letter:'ü',
-        word:'ülikool',
-        translation:'University',},
+    { id: 29,
+      letter:'ü',
+      word:'ülikool',
+      translation:'University',},
 
-      { id: 30,
-        letter:'X',
-        word:'Xylofon',
-        translation:'Xylophone',},
+    { id: 30,
+      letter:'X',
+      word:'Xylofon',
+      translation:'Xylophone',},
 
-      { id: 31,
-        letter:'W',
-        word: 'Washington',
-        translation: 'Washington',},
+    { id: 31,
+      letter:'W',
+      word: 'Washington',
+      translation: 'Washington',},
 
-      { id: 32,
-        letter:'Y',
-        word:'York',
-        translation:'York',},
+    { id: 32,
+      letter:'Y',
+      word:'York',
+      translation:'York',},
 
-    ]
+  ]
+  
   }

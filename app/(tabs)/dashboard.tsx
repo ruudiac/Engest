@@ -1,6 +1,10 @@
 import { View, Text, Pressable, Image, FlatList} from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import React, { useState } from "react";
+import { flashcardsData } from '../../app/data/lessons'
 
 const modules = [
   {
@@ -63,7 +67,29 @@ const inputStyle = {
   elevation: 4,
 }
 
+
+
+
 export default function Dashboard() {
+  const [totalXP, setTotalXP] = useState(0)
+  const [completedCounts, setCompletedCounts] = useState<Record<number, number>>({})
+  const currentLevel = Math.floor(totalXP / 100) + 1
+  useEffect(() => {
+    const loadAllCompleted = async () => {
+      const counts: Record<number, number> = {}
+      for (const module of modules) {
+        const lessons = (flashcardsData as any)[module.id] ?? []
+        let count = 0
+        for (const lesson of lessons) {
+          const result = await AsyncStorage.getItem(`completed_${module.id}_${lesson.id}`)
+          if (result === 'true') count++
+        }
+        counts[module.id] = count
+      }
+      setCompletedCounts(counts)
+    }
+    loadAllCompleted()
+  }, [])
   return (
     <SafeAreaView className="flex-1 bg-[#EAD4F6] items-center px-6">
     <View className=" flex-row items-center gap-5"> 
@@ -75,7 +101,7 @@ export default function Dashboard() {
     <View className="rounded-full bg-[#F3DEFF] border border-[#543666] overflow-hidden mr-2">
       <Image source={require('../../assets/images/star-removebg-preview.png')} style={{ width: 24, height: 24 }} resizeMode="contain"/>
     </View>
-    <Text className="font-pixel text-black text-base">LEVEL: 1</Text>
+    <Text className="font-pixel text-black text-base">LEVEL: {currentLevel}</Text>
   </Pressable>
 
   <Pressable onPress={level} className="flex-row items-center justify-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2" style={{ width: 110, ...inputStyle }}>
@@ -115,7 +141,7 @@ export default function Dashboard() {
     </View>
   </View>
   <View className='w-full h-5 border border-[#543666] bg-[#CF8DF5] rounded-full mt-2 overflow-hidden'>
-    <View style={{width: `${item.progress * 100}%`}} className="h-5 bg-[#7F39A6]"/>
+    <View style={{width: (completedCounts[item.id] ?? 0) / ((flashcardsData as any)[item.id]?.length ?? 1) * 100}} className="h-5 bg-[#7F39A6]"/>
   </View>
 </Pressable>
 )}/>
@@ -123,4 +149,3 @@ export default function Dashboard() {
     </SafeAreaView>
   );
 }
-

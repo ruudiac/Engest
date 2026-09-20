@@ -1,112 +1,214 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Audio } from 'expo-av';
+import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
 import * as FileSystem from 'expo-file-system/legacy';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { flashcardsData, lessonsData } from '../app/data/lessons';
+import FlashcardMode from '../components/flashCardMode';
+import QuizMultipleChoice from '../components/quizMultipleChoice';
 
-
-
-
-
+const estonianLetterNames: Record<string, string> = {
+  'A': 'aa', 'B': 'bee', 'C': 'tsee', 'D': 'dee', 'E': 'ee',
+  'F': 'eff', 'G': 'gee', 'H': 'haa', 'I': 'ii', 'J': 'jott',
+  'K': 'kaa', 'L': 'ell', 'M': 'emm', 'N': 'enn', 'O': 'oo',
+  'P': 'pee', 'Q': 'kuu', 'R': 'err', 'S': 'ess', 'Š': 'šaa',
+  'Z': 'zett', 'Ž': 'žee', 'T': 'tee', 'U': 'uu', 'V': 'vee',
+  'W': 'kaksisvee', 'Õ': 'õõ', 'Ä': 'ää', 'Ö': 'öö', 'Ü': 'üü',
+  'X': 'iks', 'Y': 'igrek'
+}
 
 export default function Lesson() {
   const { moduleId, lessonId } = useLocalSearchParams();
   const lesson = (lessonsData as any)[Number(moduleId)]?.find((l: any) => l.id === Number(lessonId));
-  
-
   const flashcards = (flashcardsData as any)[Number(lessonId)] ?? [];
+
   const [currentIndex, setCurrentIndex] = useState(0);
-
   const [mode, setMode] = useState('flashcard');
+  const playerRef = useRef<ReturnType<typeof createAudioPlayer> | null>(null);
+  const [mistakes, setMistakes] = useState(0)
 
-  
-const inputStyle = {
-  shadowColor: '#7F39A6',
-  shadowOffset: { width: 1, height: 3 },
-  shadowOpacity: 0.3,
-  shadowRadius: 4,
-  elevation: 4,
-}
-
-const cardStyle = {
-  shadowColor: '#9B59B6',
-  shadowOffset: { width: 4, height: 6 },
-  shadowOpacity: 0.4,
-  shadowRadius: 6,
-  elevation: 8,
-}
-const card = flashcards[currentIndex];
-
-const speakWord = async () => {
-
-  await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
-  try {
-    const response = await fetch('https://api.tartunlp.ai/text-to-speech/v2', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: `${card.letter}, ${card.word}`, speaker: 'mari' })
-    });
-
-
-
-    const arrayBuffer = await response.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-let binary = '';
-for (let i = 0; i < bytes.byteLength; i++) {
-  binary += String.fromCharCode(bytes[i]);
-}
-const base64 = btoa(binary);
-    const fileUri = (FileSystem as any).cacheDirectory + 'speech.wav';
-    
-    await (FileSystem as any).writeAsStringAsync(fileUri, base64, {
-      encoding: 'base64'
-    });
-    
-    const { sound } = await Audio.Sound.createAsync({ uri: fileUri });
-    console.log('Sound created:', sound);
-    await sound.playAsync();
-  } catch (error) {
-    console.log('Speech error:', error);
+  const inputStyle = {
+    shadowColor: '#7F39A6',
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   }
 
-};
+  const cardStyle = {
+    shadowColor: '#9B59B6',
+    shadowOffset: { width: 4, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 8,
+  }
+
+  const card = flashcards[currentIndex];
+  const notReady = !lesson || flashcards.length === 0;{}
+
+  useEffect(() => {
+    if (!card) return
+  
+    const preload = async () => {
+      try {
+        await setAudioModeAsync({
+          playsInSilentMode: true,
+        })
+  
+        const fileUri =
+          (FileSystem as any).cacheDirectory +
+          `speech_${card.letter}_${card.word}_v2.wav`
+  
+        await (FileSystem as any).deleteAsync(fileUri, {
+          idempotent: true,
+        })
+  
+        const fileInfo = await (FileSystem as any).getInfoAsync(fileUri)
+  
+        if (!fileInfo.exists) {
+          const letterName =
+            estonianLetterNames[card.letter.toUpperCase()] ?? card.letter
+  
+          const text = ` ${letterName}. ${card.word}.`
+  
+          const response = await fetch(
+            'https://api.tartunlp.ai/text-to-speech/v2',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                text,
+                speaker: 'mari',
+              }),
+            }
+          )
+  
+          const arrayBuffer = await response.arrayBuffer()
+          const bytes = new Uint8Array(arrayBuffer)
+  
+          let binary = ''
+  
+          for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i])
+          }
+  
+          const base64 = btoa(binary)
+  
+          await (FileSystem as any).writeAsStringAsync(
+            fileUri,
+            base64,
+            { encoding: 'base64' }
+          )
+        }
+  
+        if (!playerRef.current) {
+          playerRef.current = createAudioPlayer(fileUri)
+        } else {
+          playerRef.current.replace(fileUri)
+        }
+      } catch (error) {
+        console.log('Preload error:', error)
+      }
+    }
+  
+    preload()
+  
+    return () => {
+      if (playerRef.current) {
+        playerRef.current.remove()
+        playerRef.current = null
+      }
+    }
+  }, [card])
+
+  const speakWord = async () => {
+    try {
+      if (playerRef.current) {
+        await playerRef.current.seekTo(0)
+        playerRef.current.play()
+      }
+    } catch (error) {
+      console.log('Speech error:', error)
+    }
+  }
+
+  if (notReady) {
+    return (
+      <SafeAreaView className="flex-1 bg-[#F1D4FF] px-6 items-center justify-center">
+        <Text className="text-center text-lg font-inter mt-10 text-[#543666]">
+          Not yet ready. Please check the lesson and flashcard data.
+        </Text>
+        <Pressable onPress={ () => router.back()} className="mt-4 px-4 py-2 bg-[#E2BFF6] border border-[#543666] rounded-full" style ={inputStyle}>
+          <Text className='font-pixel'>Tagasi</Text>
+          </Pressable>
+      </SafeAreaView>
+    )
+  }
 
   return (
-    <SafeAreaView className="flex-1 bg-[#F1D4FF] px-6" >
+    <SafeAreaView className="flex-1 bg-[#F1D4FF] px-6">
       <View className="flex-row items-center justify-between w-full">
-      <Pressable onPress={ () => router.back()} className="flex-row items-center  rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2 mr-2 " style={{ ...inputStyle }}>
-        <Ionicons name="caret-back" size={24} color="#7F39A6" /></Pressable>
+        <Pressable
+          onPress={() => router.back()}
+          className="flex-row items-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2 mr-2"
+          style={{ ...inputStyle }}
+        >
+          <Ionicons name="caret-back" size={24} color="#7F39A6" />
+        </Pressable>
       </View>
 
-        <Text className='text-right mt-5 font-pixel text-lg'>{currentIndex + 1}/{flashcards.length}</Text>
-        <View className='w-full h-9 border border-[#543666] bg-[#CF8DF5] rounded-full mt-2 mb-9 overflow-hidden'>
-    <View style={{width: `${(currentIndex / flashcards.length) * 100}%`}} className="h-9 bg-[#7F39A6]"> 
-    </View>
-  </View>
-      <Text className='text-center text-3xl font-bold font-inter mt-5 mb-6 text-[#543666]'>{`Lesson ${lesson.id}: ${lesson.name}`}</Text>
+      <Text className='text-right mt-5 font-pixel text-lg'>
+        {currentIndex + 1}/{flashcards.length}
+      </Text>
+
+      <View className='w-full h-9 border border-[#543666] bg-[#CF8DF5] rounded-full mt-2 mb-9 overflow-hidden'>
+        <View
+          style={{ width: `${(currentIndex / flashcards.length) * 100}%` }}
+          className="h-9 bg-[#7F39A6]"
+        />
+      </View>
+
+      <Text className='text-center text-3xl font-bold font-inter mt-5 mb-6 text-[#543666]'>
+        {`Lesson ${lesson.id}: ${lesson.name}`}
+      </Text>
 
       {mode === 'flashcard' ? (
-        <View className='flex-1'>
-          <View className='bg-[#E2BFF6] rounded-3xl m-2 p-4 pb-14 flex-1 p-8 ' style={cardStyle}>
-          <Pressable onPress={speakWord}>
-  <Ionicons name="volume-high" size={32} color="#543666" />
-</Pressable><Text allowFontScaling={false} className='text-8xl text-center font-bold text-[#543666] font-inter mt-7'>{card.letter}</Text>
-          <Text allowFontScaling={false} className='mt-3 text-6xl font-inter  text-center text-[#875BA1] font-bold'>{card.word}</Text>
-          <Text allowFontScaling={false} className='mt-3 text-[#CF8DF5] text-4xl text-center font-bold font-inter'>{card.translation}</Text>
-          </View>
-          <View className="flex-row gap-5 flex-1 items-center w-full">
-            <Pressable style={inputStyle} disabled={currentIndex === 0} className=" flex-1 rounded-full bg-[#E2BFF6] border border-[#543666] py-3" onPress ={() => setCurrentIndex(currentIndex - 1)} ><Text className='text-center font-pixel text-2xl' >Previous</Text></Pressable>
-            <Pressable style={inputStyle} disabled={currentIndex === flashcards.length - 1} className="rounded-full bg-[#E2BFF6] border border-[#543666] flex-1 py-3" onPress ={() => setCurrentIndex(currentIndex + 1)} ><Text className='text-center font-pixel text-2xl'>Next</Text></Pressable>
-          </View>
-        
-  
-        </View>
-) : (
-  <View>{/* quiz content */}</View>
-)}
+        <FlashcardMode
+          card={card}
+          currentIndex={currentIndex}
+          flashcards={flashcards}
+          speakWord={speakWord}
+          onPrevious={() => setCurrentIndex(currentIndex - 1)}
+          onNext={() => {
+            if (currentIndex === flashcards.length - 1) {
+              setCurrentIndex(0)
+              setMode('quiz')
+            } else {
+              setCurrentIndex(currentIndex + 1)
+            }
+          }}
+        />
+      ) : (
+        <QuizMultipleChoice
+          card={card}
+          flashcards={flashcards}
+          speakWord={speakWord}
+          onNext={(wasCorrect: boolean) => {
+            if (!wasCorrect) {
+              setMistakes(mistakes + 1)
+            }
+            if (currentIndex === flashcards.length - 1) {
+              router.push(`/complete?mistakes=${mistakes}&total=${flashcards.length}&lessonId=${lessonId}&moduleId=${moduleId}&moduleName=${lesson.name}`)
+            } else {
+              setCurrentIndex(currentIndex + 1)
+            }
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 }
