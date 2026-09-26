@@ -4,7 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useState } from "react";
-import { flashcardsData } from '../../app/data/lessons'
+import { flashcardsData, lessonsData } from '../../app/data/lessons'
+
 
 const modules = [
   {
@@ -78,7 +79,7 @@ export default function Dashboard() {
     const loadAllCompleted = async () => {
       const counts: Record<number, number> = {}
       for (const module of modules) {
-        const lessons = (flashcardsData as any)[module.id] ?? []
+        const lessons = (lessonsData as any)[module.id] ?? []
         let count = 0
         for (const lesson of lessons) {
           const result = await AsyncStorage.getItem(`completed_${module.id}_${lesson.id}`)

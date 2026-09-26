@@ -22,7 +22,7 @@ const estonianLetterNames: Record<string, string> = {
 export default function Lesson() {
   const { moduleId, lessonId } = useLocalSearchParams();
   const lesson = (lessonsData as any)[Number(moduleId)]?.find((l: any) => l.id === Number(lessonId));
-  const flashcards = (flashcardsData as any)[Number(lessonId)] ?? [];
+  const flashcards = (flashcardsData as any)[Number(moduleId)]?.[Number(lessonId)] ?? [];
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mode, setMode] = useState('flashcard');
@@ -46,8 +46,8 @@ export default function Lesson() {
   }
 
   const card = flashcards[currentIndex];
-  const notReady = !lesson || flashcards.length === 0;{}
-
+  const notReady =!lesson || flashcards.length === 0;
+  
   useEffect(() => {
     if (!card) return
   
@@ -60,18 +60,15 @@ export default function Lesson() {
         const fileUri =
           (FileSystem as any).cacheDirectory +
           `speech_${card.letter}_${card.word}_v2.wav`
-  
-        await (FileSystem as any).deleteAsync(fileUri, {
-          idempotent: true,
-        })
+
   
         const fileInfo = await (FileSystem as any).getInfoAsync(fileUri)
   
         if (!fileInfo.exists) {
-          const letterName =
-            estonianLetterNames[card.letter.toUpperCase()] ?? card.letter
   
-          const text = ` ${letterName}. ${card.word}.`
+          const text = card.letter
+          ?  `${estonianLetterNames[card.letter.toUpperCase()] ?? card.letter}. ${card.word}.`
+          :`${card.word}.`
   
           const response = await fetch(
             'https://api.tartunlp.ai/text-to-speech/v2',
@@ -183,6 +180,7 @@ export default function Lesson() {
           flashcards={flashcards}
           speakWord={speakWord}
           onPrevious={() => setCurrentIndex(currentIndex - 1)}
+          
           onNext={() => {
             if (currentIndex === flashcards.length - 1) {
               setCurrentIndex(0)
@@ -198,11 +196,22 @@ export default function Lesson() {
           flashcards={flashcards}
           speakWord={speakWord}
           onNext={(wasCorrect: boolean) => {
+            const finalMistakes = wasCorrect ? mistakes : mistakes + 1;
+
             if (!wasCorrect) {
-              setMistakes(mistakes + 1)
+              setMistakes(finalMistakes)
             }
             if (currentIndex === flashcards.length - 1) {
-              router.push(`/complete?mistakes=${mistakes}&total=${flashcards.length}&lessonId=${lessonId}&moduleId=${moduleId}&moduleName=${lesson.name}`)
+              router.push({
+                pathname: '/complete',
+                params: {
+                  mistakes: String(finalMistakes),
+                  total: String(flashcards.length),
+                  lessonId: String(lesson.id),
+                  moduleId: String(moduleId),
+                  moduleName: lesson.name,
+                },
+              })
             } else {
               setCurrentIndex(currentIndex + 1)
             }
