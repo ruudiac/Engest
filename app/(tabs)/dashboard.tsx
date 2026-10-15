@@ -6,54 +6,34 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useState } from "react";
 import { flashcardsData, lessonsData } from '../../app/data/lessons'
 import { supabase } from '../../lib/supabase'
+import { images } from '../../lib/images'
 
 
-const modules = [
+const moduleStyles = [
   {
     id: 1,
-    name: "Grammar",
-    subtitle:"Grammatika",
     subtitleSize: 10,
-    progress: 0.5,
-    icon: require('../../assets/images/_-removebg-preview.png'),
     iconSize: 55,
   },
   {
     id: 2,
-    name: "Slang",
-    subtitle:"Släng",
-    progress: 0.9,
-    icon: require('../../assets/images/smile.png'),
-    iconSize: 28,
+    iconSize: 35,
   },
   {
     id: 3,
-    name: "Work",
-    subtitle:"Töö",
-    progress: 0.8,
-    icon: require('../../assets/images/old_suitcase_icon_pixel_art_ai_Stock_Vector-removebg-preview.png'),
-    iconSize: 55,
+    iconSize: 60,
   },
   {
     id: 4,
-    name: "Shopping",
-    subtitle:"Ostlemine",
-    progress: 0.1,
-    icon: require('../../assets/images/shoppingcart.png'),
+    iconSize: 55,
   },
   {
     id: 5,
-    name: "Docs",
-    subtitle:"Dokumendid",
-    progress: 0.3,
-    icon: require('../../assets/images/sheet.png'),
+    iconSize: 55,
   },
   {
     id: 6,
-    name: "Culture",
-    subtitle:"Kultuur",
-    progress: 0.7,
-    icon: require('../../assets/images/tantsijad.png'),
+    iconSize: 55,
   },
 ];
 
@@ -74,15 +54,16 @@ const inputStyle = {
 
 export default function Dashboard() {
   const [totalXP, setTotalXP] = useState(0)
+  const [modules, setModules] = useState<any[]>([])
   const [completedCounts, setCompletedCounts] = useState<Record<number, number>>({})
   const currentLevel = Math.floor(totalXP / 100) + 1
 
   useEffect(() => {
     supabase.from('modules').select('*').then(({ data, error }) => {
-      console.log('modules:', data, error)
+      if (data) setModules(data)
     })
   }, [])
-  
+
   useEffect(() => {
     const loadAllCompleted = async () => {
       const counts: Record<number, number> = {}
@@ -98,7 +79,7 @@ export default function Dashboard() {
       setCompletedCounts(counts)
     }
     loadAllCompleted()
-  }, [])
+  }, [modules])
   return (
     <SafeAreaView className="flex-1 bg-[#EAD4F6] items-center px-6">
     <View className=" flex-row items-center gap-5"> 
@@ -140,11 +121,14 @@ export default function Dashboard() {
       <Pressable onPress={ () => router.push({ pathname: '/module', params: {id: item.id, name: item.name} })} className='bg-[#E2BFF6] border border-[#543666] rounded-3xl m-2 p-4 flex-1 mt-6'style={inputStyle}>
   <View className="flex-row items-center gap-2 mb-2 m-1">
   <View style={{ width: 54, height: 54 }} className="items-center justify-center rounded-full bg-[#F3DEFF] border border-[#543666] overflow-hidden mr-2">
-  <Image source={item.icon} style={{ width: item.iconSize || 44, height: item.iconSize || 44 }} className="w-full h-full" resizeMode="contain" />
+  <Image source={images[item.icon_key]} style={{
+  width: moduleStyles.find(s => s.id === item.id)?.iconSize || 44,
+  height: moduleStyles.find(s => s.id === item.id)?.iconSize || 44,
+}} className="w-full h-full" resizeMode="contain" />
 </View>
     <View className='flex-1 py-3'>
       <Text className='font-pixel text-black text-sm '>{item.name}</Text>
-      <Text style={{ fontSize: item.subtitleSize || 10 }} className='font-pixel text-[#A35C83]'>
+      <Text style={{ fontSize: moduleStyles.find(s => s.id === item.id)?.subtitleSize || 10 }} className='font-pixel text-[#A35C83]'>
   {item.subtitle}
 </Text>
     </View>
