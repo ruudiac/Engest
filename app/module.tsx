@@ -3,14 +3,14 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Foundation from '@expo/vector-icons/Foundation';
-import { lessonsData } from '../app/data/lessons';
 import React, { useState, useEffect, useRef } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
+import { supabase } from '../lib/supabase'
+import { images } from '../lib/images'
 
 export default function Module() {
   const { id, name } = useLocalSearchParams(); 
-  const lessons = (lessonsData as any)[Number(id)] ?? [];
+  const [lessons, setLessons] = useState<any[]>([])
   const [completedCount, setCompletedCount] = useState(0)
 
 const inputStyle = {
@@ -21,10 +21,19 @@ const inputStyle = {
   elevation: 4,
 }
 useEffect(() => {
+  supabase
+    .from('lessons')
+    .select('*')
+    .eq('module_id', Number(id))
+    .order('lesson_number')
+    .then(({ data }) => { if (data) setLessons(data) })
+}, [])
+
+useEffect(() => {
   const loadCompleted = async () => {
     let count = 0
     for (const lesson of lessons) {
-      const result = await AsyncStorage.getItem(`completed_${id}_${lesson.id}`)
+      const result = await AsyncStorage.getItem(`completed_${id}_${lesson.lesson_number}`)
       if (result === 'true') {
         count = count + 1
       }
@@ -32,7 +41,7 @@ useEffect(() => {
     setCompletedCount(count)
   }
   loadCompleted()
-}, [])
+}, [lessons])
  
 
 return (
@@ -55,7 +64,7 @@ return (
         <Text className='text-center font- mt-3 text-xl'>Completed</Text>
       </View>
       <View className='w-full h-5 border border-[#543666] bg-[#CF8DF5] rounded-full mt-2 overflow-hidden'>
-    <View style={{width: `${(completedCount / lessons.length)*100}%`}} className="h-5 bg-[#7F39A6]"> 
+    <View style={{width: `${(completedCount / lessons.length || 1)*100}%`}} className="h-5 bg-[#7F39A6]"> 
     </View>
   </View>
   <FlatList
@@ -78,16 +87,16 @@ return (
     </View>
     </View>
     
-      <Pressable onPress={ () => router.push({ pathname: '/lesson', params: { moduleId: id, lessonId:  item.id} })} className='bg-[#E2BFF6] border border-[#875BA1] rounded-3xl m-2 p-4 pb-14 flex-1 'style={{position: 'relative', ...inputStyle, }}>
+      <Pressable onPress={ () => router.push({ pathname: '/lesson', params: { moduleId: id, lessonId: item.lesson_number } })} className='bg-[#E2BFF6] border border-[#875BA1] rounded-3xl m-2 p-4 pb-14 flex-1 'style={{position: 'relative', ...inputStyle, }}>
         <Text className='text-center font-inter text-xl font-bold'>{item.name}</Text>
         <Text className='text-center font-inter text-s text-[#875BA1] font-bold mt-1'>
         {item.subtitle}
         </Text>
         <View style={{ position: 'absolute', bottom: 6, left: 8, width: 10, height: 90 }}>
-          <Image source={item.icon}/>
+        <Image source={images[item.icon_key]}/>
         </View>
         <View style={{ position: 'absolute', bottom: 6, right: 8, width: 80, height: 80 }}>
-        <Image source={item.icon2} />
+        <Image source={images[item.icon2_key]} />
         </View>
       </Pressable>
     </View>
