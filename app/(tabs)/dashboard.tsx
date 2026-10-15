@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useState } from "react";
 import { flashcardsData, lessonsData } from '../../app/data/lessons'
+import { supabase } from '../../lib/supabase'
 
 
 const modules = [
@@ -75,6 +76,13 @@ export default function Dashboard() {
   const [totalXP, setTotalXP] = useState(0)
   const [completedCounts, setCompletedCounts] = useState<Record<number, number>>({})
   const currentLevel = Math.floor(totalXP / 100) + 1
+
+  useEffect(() => {
+    supabase.from('modules').select('*').then(({ data, error }) => {
+      console.log('modules:', data, error)
+    })
+  }, [])
+  
   useEffect(() => {
     const loadAllCompleted = async () => {
       const counts: Record<number, number> = {}
