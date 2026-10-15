@@ -4,15 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useState } from "react";
-import { flashcardsData, lessonsData } from '../../app/data/lessons'
 import { supabase } from '../../lib/supabase'
 import { images } from '../../lib/images'
+import PixelProgress from '../../components/pixelProgress'
 
 
 const moduleStyles = [
   {
     id: 1,
-    subtitleSize: 10,
     iconSize: 55,
   },
   {
@@ -59,19 +58,21 @@ export default function Dashboard() {
   const currentLevel = Math.floor(totalXP / 100) + 1
 
   useEffect(() => {
-    supabase.from('modules').select('*').then(({ data, error }) => {
-      if (data) setModules(data)
-    })
+    supabase
+      .from('modules')
+      .select('*, lessons(lesson_number)')
+      .order('id')
+      .then(({ data }) => { if (data) setModules(data) })
   }, [])
 
   useEffect(() => {
     const loadAllCompleted = async () => {
       const counts: Record<number, number> = {}
       for (const module of modules) {
-        const lessons = (lessonsData as any)[module.id] ?? []
+        const lessons = module.lessons ?? []
         let count = 0
         for (const lesson of lessons) {
-          const result = await AsyncStorage.getItem(`completed_${module.id}_${lesson.id}`)
+          const result = await AsyncStorage.getItem(`completed_${module.id}_${lesson.lesson_number}`)
           if (result === 'true') count++
         }
         counts[module.id] = count
@@ -81,7 +82,7 @@ export default function Dashboard() {
     loadAllCompleted()
   }, [modules])
   return (
-    <SafeAreaView className="flex-1 bg-[#EAD4F6] items-center px-6">
+    <SafeAreaView edges={['top']} className="flex-1 bg-[#EAD4F6] items-center px-6">
     <View className=" flex-row items-center gap-5"> 
         <Text className=" flex-2 text-center font-pixel text-5xl mt-4">Dashboard</Text>
     </View>
@@ -113,31 +114,35 @@ export default function Dashboard() {
     </View>
 
     <FlatList 
+    contentContainerStyle={{ paddingBottom: 24 }}
+    showsVerticalScrollIndicator={false}
     className='w-full'
     data={modules}
     numColumns={2}
     keyExtractor={(item) => item.id.toString()}
     renderItem={({ item }) => (
-      <Pressable onPress={ () => router.push({ pathname: '/module', params: {id: item.id, name: item.name} })} className='bg-[#E2BFF6] border border-[#543666] rounded-3xl m-2 p-4 flex-1 mt-6'style={inputStyle}>
-  <View className="flex-row items-center gap-2 mb-2 m-1">
-  <View style={{ width: 54, height: 54 }} className="items-center justify-center rounded-full bg-[#F3DEFF] border border-[#543666] overflow-hidden mr-2">
-  <Image source={images[item.icon_key]} style={{
-  width: moduleStyles.find(s => s.id === item.id)?.iconSize || 44,
-  height: moduleStyles.find(s => s.id === item.id)?.iconSize || 44,
-}} className="w-full h-full" resizeMode="contain" />
-</View>
-    <View className='flex-1 py-3'>
-      <Text className='font-pixel text-black text-sm '>{item.name}</Text>
-      <Text style={{ fontSize: moduleStyles.find(s => s.id === item.id)?.subtitleSize || 10 }} className='font-pixel text-[#A35C83]'>
-  {item.subtitle}
-</Text>
-    </View>
-  </View>
-  <View className='w-full h-5 border border-[#543666] bg-[#CF8DF5] rounded-full mt-2 overflow-hidden'>
-    <View style={{width: (completedCounts[item.id] ?? 0) / ((flashcardsData as any)[item.id]?.length ?? 1) * 100}} className="h-5 bg-[#7F39A6]"/>
-  </View>
-</Pressable>
-)}/>
+      <Pressable
+        onPress={() => router.push({ pathname: '/module', params: { id: item.id, name: item.name } })}
+        className='bg-[#E2BFF6] border border-[#543666] rounded-3xl m-2 p-4 flex-1 items-center'
+        style={inputStyle}
+      >
+        <View style={{ width: 64, height: 64 }} className="items-center justify-center rounded-full bg-[#F3DEFF] border border-[#543666] overflow-hidden">
+          <Image
+            source={images[item.icon_key]}
+            style={{
+              width: moduleStyles.find(s => s.id === item.id)?.iconSize || 44,
+              height: moduleStyles.find(s => s.id === item.id)?.iconSize || 44,
+            }}
+            resizeMode="contain"
+          />
+        </View>
+        <Text className='font-pixel text-black text-base mt-3' numberOfLines={1}>{item.name}</Text>
+        <Text className='font-pixel text-[#A35C83] text-xs' numberOfLines={1}>{item.subtitle}</Text>
+        <View className="mt-auto pt-3 w-full">
+          <PixelProgress total={item.lessons?.length ?? 0} done={completedCounts[item.id] ?? 0} />
+        </View>
+      </Pressable>
+    )}/>
 
     </SafeAreaView>
   );

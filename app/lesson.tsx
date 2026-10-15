@@ -7,8 +7,8 @@ import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FlashcardMode from '../components/flashCardMode';
 import QuizMultipleChoice from '../components/quizMultipleChoice';
-import { supabase } from '../lib/supabase'
-import { images } from '../lib/images'
+import { images } from '../lib/images';
+import { supabase } from '../lib/supabase';
 
 const estonianLetterNames: Record<string, string> = {
   'A': 'aa', 'B': 'bee', 'C': 'tsee', 'D': 'dee', 'E': 'ee',
