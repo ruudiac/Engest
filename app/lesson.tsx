@@ -5,9 +5,10 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { flashcardsData, lessonsData } from '../app/data/lessons';
 import FlashcardMode from '../components/flashCardMode';
 import QuizMultipleChoice from '../components/quizMultipleChoice';
+import { supabase } from '../lib/supabase'
+import { images } from '../lib/images'
 
 const estonianLetterNames: Record<string, string> = {
   'A': 'aa', 'B': 'bee', 'C': 'tsee', 'D': 'dee', 'E': 'ee',
@@ -21,8 +22,9 @@ const estonianLetterNames: Record<string, string> = {
 
 export default function Lesson() {
   const { moduleId, lessonId } = useLocalSearchParams();
-  const lesson = (lessonsData as any)[Number(moduleId)]?.find((l: any) => l.id === Number(lessonId));
-  const flashcards = (flashcardsData as any)[Number(moduleId)]?.[Number(lessonId)] ?? [];
+  const [lesson, setLesson] = useState<any>(null)
+  const [flashcards, setFlashcards] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mode, setMode] = useState('flashcard');
@@ -49,9 +51,28 @@ export default function Lesson() {
 
   const card = mode === 'quiz' ? quizorder[currentIndex] : flashcards[currentIndex];
   const notReady =!lesson || flashcards.length === 0;
+
+  useEffect(() => {
+    supabase
+      .from('lessons')
+      .select('*, cards(*)')
+      .eq('module_id', Number(moduleId))
+      .eq('lesson_number', Number(lessonId))
+      .order('position', { referencedTable: 'cards' })
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setLesson(data)
+          setFlashcards(data.cards.map((c: any) => ({ ...c, image: images[c.image_key] })))
+        }
+        setLoading(false)
+      })
+  }, [])
   
   useEffect(() => {
     if (!card) return
+
+    
   
     const preload = async () => {
       try {
@@ -134,7 +155,9 @@ export default function Lesson() {
       console.log('Speech error:', error)
     }
   }
-
+  if (loading) {
+    return <SafeAreaView className="flex-1 bg-[#F1D4FF]" />
+  }
   if (notReady) {
     return (
       <SafeAreaView className="flex-1 bg-[#F1D4FF] px-6 items-center justify-center">
@@ -172,7 +195,7 @@ export default function Lesson() {
       </View>
 
       <Text className='text-center text-3xl font-bold font-inter pt-6 text-[#543666]'>
-        {`Lesson ${lesson.id}: ${lesson.name}`}
+        {`Lesson ${lesson.lesson_number}: ${lesson.name}`}
       </Text>
 
       {mode === 'flashcard' ? (
@@ -211,7 +234,7 @@ export default function Lesson() {
                 params: {
                   mistakes: String(finalMistakes),
                   total: String(flashcards.length),
-                  lessonId: String(lesson.id),
+                  lessonId: String(lesson.lesson_number),
                   moduleId: String(moduleId),
                   moduleName: lesson.name,
                 },
