@@ -52,7 +52,7 @@ return (
         <Text className="font-pixel text-black text-2xl mr-5 mt-4 w-full text-center">{`Module ${id}: ${name}`}</Text> 
       </View>
       <View className='w-full'>
-        <Text className='text-center font-pixel mt-3 text-xl'>Completed</Text>
+        <Text className='text-center font- mt-3 text-xl'>Completed</Text>
       </View>
       <View className='w-full h-5 border border-[#543666] bg-[#CF8DF5] rounded-full mt-2 overflow-hidden'>
     <View style={{width: `${(completedCount / lessons.length)*100}%`}} className="h-5 bg-[#7F39A6]"> 

@@ -45,7 +45,9 @@ export default function Lesson() {
     elevation: 8,
   }
 
-  const card = flashcards[currentIndex];
+  const [quizorder, setQuizOrder] = useState(flashcards);
+
+  const card = mode === 'quiz' ? quizorder[currentIndex] : flashcards[currentIndex];
   const notReady =!lesson || flashcards.length === 0;
   
   useEffect(() => {
@@ -158,18 +160,18 @@ export default function Lesson() {
         </Pressable>
       </View>
 
-      <Text className='text-right mt-5 font-pixel text-lg'>
+      <Text className='text-right font-inter text-lg'>
         {currentIndex + 1}/{flashcards.length}
       </Text>
 
-      <View className='w-full h-9 border border-[#543666] bg-[#CF8DF5] rounded-full mt-2 mb-9 overflow-hidden'>
+      <View className='w-full h-9 border border-[#543666] bg-[#CF8DF5] rounded-full overflow-hidden'>
         <View
           style={{ width: `${(currentIndex / flashcards.length) * 100}%` }}
           className="h-9 bg-[#7F39A6]"
         />
       </View>
 
-      <Text className='text-center text-3xl font-bold font-inter mt-5 mb-6 text-[#543666]'>
+      <Text className='text-center text-3xl font-bold font-inter pt-6 text-[#543666]'>
         {`Lesson ${lesson.id}: ${lesson.name}`}
       </Text>
 
@@ -183,6 +185,8 @@ export default function Lesson() {
           
           onNext={() => {
             if (currentIndex === flashcards.length - 1) {
+              const shuffled = [...flashcards].sort(() => Math.random() - 0.5);
+              setQuizOrder(shuffled)
               setCurrentIndex(0)
               setMode('quiz')
             } else {
@@ -193,7 +197,7 @@ export default function Lesson() {
       ) : (
         <QuizMultipleChoice
           card={card}
-          flashcards={flashcards}
+          flashcards={quizorder}
           speakWord={speakWord}
           onNext={(wasCorrect: boolean) => {
             const finalMistakes = wasCorrect ? mistakes : mistakes + 1;

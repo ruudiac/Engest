@@ -19,7 +19,10 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-audio"
+      "expo-audio",
+      "expo-image",
+      "expo-splash-screen",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

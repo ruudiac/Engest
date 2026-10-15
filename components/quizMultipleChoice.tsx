@@ -9,9 +9,9 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
     const others = flashcards
       .filter((f: any) => f.translation !== card.translation)
       .sort(() => Math.random() - 0.5)
-      .slice(0, 3)
+      .slice(0, 2)
       .map((f: any) => f.translation)
-    
+
     return [...others, card.translation].sort(() => Math.random() - 0.5)
   }, [card])
 
@@ -22,55 +22,67 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
     shadowOffset: { width: 4, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 6,
-    elevation: 8,}
+    elevation: 8,
+  }
+
+
+  const getState = (option: string) => {
+    if (!selectedAnswer) return 'idle'
+    if (option === card.translation) return 'correct'          
+    if (option === selectedAnswer) return 'wrong'              
+    return 'dim'                                               
+  }
+
+  const styles: any = {
+    idle:    { box: 'bg-[#e4c6f5] border-[#8934ba]', text: 'text-[#8934ba]' },
+    correct: { box: 'bg-[#E3F7D9] border-[#6BBF59]', text: 'text-[#2F6B22]' },
+    wrong:   { box: 'bg-[#FBE3EC] border-[#D9568A]', text: 'text-[#8A2350]' },
+    dim:     { box: 'bg-[#FBF5FF] border-[#EBD5F7] opacity-40', text: 'text-[#543666]' },
+  }
 
   return (
     <View className='flex-1'>
-      
-      
-      <View className='bg-[#E2BFF6] rounded-3xl p-8 m-2 items-center justify-center mb-7' style={{ minHeight: 160, ...cardStyle }}>
+      {/* Word card */}
+      <View className='bg-[#E2BFF6] rounded-3xl mt-6 items-center justify-center mb-7' style={{ height: 300, ...cardStyle }}>
         <Text className='text-6xl font-bold text-[#543666] font-inter'>{card.word}</Text>
-        <Pressable onPress={speakWord} className="mt-3"><Ionicons name="volume-high" size={32} color="#543666" /></Pressable>
+        <Pressable onPress={speakWord} className="mt-4 w-12 h-12 rounded-full bg-[#F6E9FF] items-center justify-center">
+          <Ionicons name="volume-high" size={24} color="#7F39A6" />
+        </Pressable>
       </View>
 
-      
-      <View className='flex-1 mt-6 gap-2'>
-    
-        {options.map((option: string) => (
-          <Pressable
-            key={option}
-            onPress={() => setSelectedAnswer(option)}
-            disabled={selectedAnswer !== null}
-            className='rounded-full border py-3 px-6'
-            style={{
-              backgroundColor: selectedAnswer === option
-                ? isCorrect ? '#02F25D' : '#FF2424'
-                : '#E2BFF6',
-              borderColor: '#543666'
-            }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-            <Text className='text-center font-inter font-bold text-2xl text-[#543666]'>{option}</Text>
-            {selectedAnswer && option === selectedAnswer && isCorrect && <Text className="text-2xl"> ✓</Text>}
-            {selectedAnswer && option === selectedAnswer && !isCorrect && <Text className="text-2xl"> ✗</Text>}
-            {selectedAnswer && option !== selectedAnswer && option === card.translation && <Text className="text-2xl"> ✓</Text>}
-            </View>
-          </Pressable>
-        ))}
+      {/* Answer options */}
+      <View className='gap-3'>
+        {options.map((option: string) => {
+          const state = getState(option)
+          return (
+            <Pressable
+              key={option}
+              onPress={() => setSelectedAnswer(option)}
+              disabled={selectedAnswer !== null}
+              className={`h-16 rounded-2xl border-2 px-5 flex-row items-center justify-center ${styles[state].box}`}
+            >
+              <Text className={`font-inter font-bold text-xl ${styles[state].text}`}>{option}</Text>
+              {state === 'correct' && <Ionicons name="checkmark-circle" size={26} color="#6BBF59" />}
+              {state === 'wrong' && <Ionicons name="close-circle" size={26} color="#D9568A" />}
+            </Pressable>
+          )
+        })}
       </View>
 
-    
+      {/* Next */}
       {selectedAnswer && (
-  <Pressable
-    onPress={() => {
-        setSelectedAnswer(null)  
-        onNext(isCorrect)}}
-    className='rounded-full py-4 mb-4'
-    style={{ backgroundColor: isCorrect ? '#02F25D' : '#FF2424'}}
-  >
-    <Text className='text-center font-inter font-bold text-2xl text-[#543666]'>Next</Text>
-  </Pressable>
-)}
-</View>
+        <Pressable
+          onPress={() => {
+            setSelectedAnswer(null)
+            onNext(isCorrect)
+          }}
+          className='h-14 mt-6 rounded-2xl flex-row items-center justify-center gap-2 bg-[#543666]'
+          style={{ shadowColor: '#543666', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 }}
+        >
+          <Text className='font-inter font-semibold text-lg text-white'>Next</Text>
+          <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+        </Pressable>
+      )}
+    </View>
   )
 }

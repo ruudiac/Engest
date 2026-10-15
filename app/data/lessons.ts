@@ -10,41 +10,58 @@ const estonianLetterNames: Record<string, string> = {
 
 export const lessonsData = {
   1: [
-    { id: 1, 
-      name: 'Tähed 1', 
-      subtitle: 'Letters 1',   
+    { 
+      id: 1, 
+      name: 'Täishäälikud', 
+      subtitle: 'Vowels',   
       icon: require('../../assets/images/A.png'),
       icon2: require('../../assets/images/O.png')},
 
-    { id: 2, 
-      name: 'Tähed 2', 
-      subtitle: 'Letters 2',   
+    { 
+      id: 2, 
+      name: 'Õ, ä, ö, ü', 
+      subtitle: 'Special vowels',   
       icon: require('../../assets/images/A.png'),
       icon2: require('../../assets/images/O.png')},
 
-    { id: 3, 
-      name: 'Tähed 3', 
-      subtitle: 'Letters 3',   
+    { 
+      id: 3, 
+      name: 'Pikk ja lühike häälik', 
+      subtitle: 'Long and short vowel',   
       icon: require('../../assets/images/A.png'),
       icon2: require('../../assets/images/O.png')},
 
-    { id: 4, 
+    {
+      id: 4,
+      name:'Numbrid',
+      subtitle: 'Numbers',
+    },
+
+    { 
+      id: 5, 
       name: 'Tervitused', 
       subtitle: 'Greetings', 
       icon2: require('../../assets/images/kasi1.png'),
       icon: require('../../assets/images/kasi2.png')
      },
 
-    { id: 5,
+    { 
+      id: 6,
       name: 'Nädalapäevad', 
       subtitle: 'Days of the week', 
       icon2: require('../../assets/images/kalender.png') },
 
-    { id: 6, 
+    { 
+      id: 7, 
       name: 'Ilm', 
       subtitle: 'Weather', 
       icon: require('../../assets/images/paike.png'),
-      icon2: require('../../assets/images/pilv.png') }
+      icon2: require('../../assets/images/pilv.png') },
+    {
+      id: 8,
+      name: 'Toit ja jook',
+      subtitle: 'Food and drink',
+    }
     ],
 
   2: [ 
@@ -150,167 +167,288 @@ export const lessonsData = {
         { id: 1,
         letter: 'A',
         word: 'Apelsin',
-        translation: 'Orange',},
+        translation: 'Orange',
+        image: require('../../assets/images/apelsin.png'),
+        cases: {
+          nimetav: 'Apelsin', omastav: 'Apelsini', osastav: 'Apelsini', sisseütlev: 'Apelsini',seesütlev: 'Apelsinis', seestütlev: 'Apelsinist', alaleütlev: 'Apelsinile', alalütlev: 'Apelsinil', alaltütlev: 'Apelsinilt', saav: 'Apelsiniks', rajav: 'Apelsinini', olev: 'Apelsinina', ilmaütlev: 'Apelsinita', kaasaütlev: 'Apelsiniga'
+        }
+      },
   
         { id: 2,
-          letter: 'B',
-          word: 'Banaan',
-          translation: 'Banana',},
-        
-        { id: 3,
-          letter: 'C',
-          word: 'Cola',
-          translation: 'Cola',},
-  
-        { id: 4,
-          letter: 'D',
-          word: 'Diivan',
-          translation: 'Couch',},
-  
-        { id: 5,
           letter: 'E',
           word: 'Ema',
-          translation: 'Mother',},
-  
-        { id: 6,
-          letter: 'F',
-          word: 'Foto',
-          translation: 'Photo',},
-  
-        { id: 7,
-          letter: 'G',
-          word: 'Gümnaasium',
-          translation: 'gymnasium',},
-  
-        { id: 8,
-          letter: 'H',
-          word: 'Hunt',
-          translation: 'Wolf',},
-  
-        { id: 9,
-          letter: 'I',
-          word: 'Ilves',
-          translation: 'Lynx',},
-  
-        { id: 10,
-          letter: 'J',
-          word: 'Jänes',
-          translation: 'Rabbit',},
-      ],
-      2:[
-        { id: 11,
-          letter: 'K',
-          word: 'Kass',
-          translation: 'Cat',},
-  
-        {id: 12,
-          letter: 'L',
-          word: 'Lõvi',
-          translation: 'Lion',},
-  
-        { id: 13,
-          letter: 'M',
-          word: 'Maasikas',
-          translation: 'Strawberry',},
-  
-        { id: 14,
+          translation: 'Mother',
+          image: require('../../assets/images/mom.png'),
+          cases: {
+            nimetav: 'Ema', omastav: 'Ema', osastav: 'Ema', sisseütlev: 'Emasse',seesütlev: 'Emas', seestütlev: 'Emast', alaleütlev: 'Emale', alalütlev: 'Emal', alaltütlev: 'Emalt', saav: 'Emaks', rajav: 'Emani', olev: 'Emana', ilmaütlev: 'Emata', kaasaütlev: 'Emaga'
+          }
+        
+        },
+        
+        { id: 3,
           letter: 'N',
           word: 'Nina',
-          translation: 'Nose',},
+          translation: 'Nose',
+          image: require('../../assets/images/nose.png'),
+          cases:{
+            nimetav: 'Nina', omastav: 'Nina', osastav: 'Nina', sisseütlev: 'Ninasse',seesütlev: 'Ninas', seestütlev: 'Ninast', alaleütlev: 'Ninale', alalütlev: 'Ninal', alaltütlev: 'Ninalt', saav: 'Ninaks', rajav: 'Ninani', olev: 'Ninana', ilmaütlev: 'Ninata', kaasaütlev: 'Ninaga'
+          }
+        },
   
-        { id: 15,
+        { id: 4,
           letter:'O',
           word:'Orav',
-          translation: 'Squirrel',},
-  
-        { id: 16,
-          letter:'P',
-          word:'Päike',
-          translation:'The sun',},
-  
-        { id: 17,
-          letter:'Q',
-          word:'Qatar',
-          translation:'Qatar',},
-  
-        { id: 18,
-          letter:'R',
-          word:'Roos',
-          translation:'Rose',},
-        
-        { id: 19,
-          letter:'S',
-          word:'Sall',
-          translation:'Scarf',},
-  
-        { id: 20,
-          letter:'š',
-          word:'šokolaad',
-          translation:'Chocolate',}
+          translation: 'Squirrel',
+          image: require('../../assets/images/orav.png'),
+          cases:{
+            nimetav: 'Orav', omastav: 'Orava', osastav: 'Oravat', sisseütlev: 'Oravasse',seesütlev: 'Oravas', seestütlev: 'Oravast', alaleütlev: 'Oravale', alalütlev: 'Oraval', alaltütlev: 'Oravalt', saav: 'Oravaks', rajav: 'Oravani', olev: 'Oravana', ilmaütlev: 'Oravata', kaasaütlev: 'Oravaga'
+          }
+        },
+
+        { id: 5,
+          letter: 'F',
+          word: 'Foto',
+          translation: 'Photograph',
+          image: require('../../assets/images/photo.png'),
+          cases: {
+            nimetav: 'Foto', omastav: 'Foto', osastav: 'Fotot', sisseütlev: 'Fotosse',seesütlev: 'Fotos', seestütlev: 'Fotost', alaleütlev: 'Fotole', alalütlev: 'Fotol', alaltütlev: 'Fotolt', saav: 'Fotoks', rajav: 'Fotoni', olev: 'Fotona', ilmaütlev: 'Fotota', kaasaütlev: 'Fotoga'
+          }},
+
+          { id: 6,
+            letter: 'I',
+            word: 'Ilves',
+            translation: 'Lynx',
+            image: require('../../assets/images/ilves.png'),
+            cases: {
+              nimetav: 'Ilves', omastav: 'Ilvese', osastav: 'Ilvest', sisseütlev: 'Ilvesesse',seesütlev: 'Ilveses', seestütlev: 'Ilvesest', alaleütlev: 'Ilvesele', alalütlev: 'Ilvesel', alaltütlev: 'Ilveselt', saav: 'Ilveseks', rajav: 'Ilveseni', olev: 'Ilvesena', ilmaütlev: 'Ilveseta', kaasaütlev: 'Ilvesega'
+            }
+          },
+
+          { id: 7,
+            letter: 'H',
+            word: 'Hunt',
+            translation: 'Wolf',
+            image: require('../../assets/images/wolf.png'),
+            cases: {
+              nimetav: 'Hunt', omastav: 'Hundi', osastav: 'Hunti', sisseütlev: 'Hunti',seesütlev: 'Hundis', seestütlev: 'Hundist', alaleütlev: 'Hundile', alalütlev: 'Hundil', alaltütlev: 'Hundilt', saav: 'Hundiks', rajav: 'Hundini', olev: 'Hundina', ilmaütlev: 'Hundita', kaasaütlev: 'Hundiga'
+            }
+          },
+
+          { id: 8,
+            letter:'U',
+            word:'Uks',
+            translation:'Door',
+            image: require('../../assets/images/uks.png'),
+            cases:{
+              nimetav: 'Uks', omastav: 'Ukse', osastav: 'Ust', sisseütlev: 'Uksesse',seesütlev: 'Ukses', seestütlev: 'Uksest', alaleütlev: 'Uksele', alalütlev: 'Uksel', alaltütlev: 'Ukselt', saav: 'Ukseks', rajav: 'Ukseni', olev: 'Uksena', ilmaütlev: 'Ukseta', kaasaütlev: 'Uksega'
+            }
+          }
+      ],
+      2:[
+
+        { id: 9,
+          letter:'õ',
+          word:'õun',
+          translation:'Apple',
+          image: require('../../assets/images/apple.png'),
+          cases:{
+            nimetav: 'õun', omastav: 'õuna', osastav: 'õuna', sisseütlev: 'õuna',seesütlev: 'õunas', seestütlev: 'õunast', alaleütlev: 'õunale', alalütlev: 'õunal', alaltütlev: 'õunalt', saav: 'õunaks', rajav: 'õunani', olev: 'õunana', ilmaütlev: 'õunata', kaasaütlev: 'õunaga'
+          }
+        },
+
+        {id: 10,
+          letter:'L',
+          word: 'Lõvi',
+          translation: 'Lion',
+          image: require('../../assets/images/Lion.png'),
+          cases:{
+            nimetav: 'Lõvi', omastav: 'Lõvi', osastav: 'Lõvi', sisseütlev: 'Lõvisse',seesütlev: 'Lõvis', seestütlev: 'Lõvist', alaleütlev: 'Lõvile', alalütlev: 'Lõvil', alaltütlev: 'Lõvilt', saav: 'Lõviks', rajav: 'Lõvini', olev: 'Lõvina', ilmaütlev: 'Lõvita', kaasaütlev: 'Lõviga'
+          }
+        },
+
+        { id: 11,
+          letter:'ä',
+          word:'ämblik',
+          translation:'Spider',
+          image: require('../../assets/images/spider.png'),
+          cases:{
+            nimetav: 'ämblik', omastav: 'ämbliku', osastav: 'ämblikku', sisseütlev: 'ämblikku',seesütlev: 'ämblikus', seestütlev: 'ämblikust', alaleütlev: 'ämblikule', alalütlev: 'ämblikul', alaltütlev: 'ämblikult', saav: 'ämblikuks', rajav: 'ämblikuni', olev: 'ämblikuna', ilmaütlev: 'ämblikuta', kaasaütlev: 'ämblikuga'
+          }
+        },
+
+        { id: 12,
+          letter:'J',
+          word: 'Jänes',
+          translation: 'Rabbit',
+          image: require('../../assets/images/rabbit.png'),
+          cases: {
+            nimetav: 'Jänes', omastav: 'Jänese', osastav: 'Jänest', sisseütlev: 'Jänesesse',seesütlev: 'Jäneses', seestütlev: 'Jänesest', alaleütlev: 'Jänesele', alalütlev: 'Jänesel', alaltütlev: 'Jäneselt', saav: 'Jäneseks', rajav: 'Jäneseni', olev: 'Jänesena', ilmaütlev: 'Jäneseta', kaasaütlev: 'Jänesega'
+          }
+        },
+
+        { id: 13,
+          letter:'ö',
+          word:'öökull',
+          translation:'Owl',
+          image: require('../../assets/images/owl.png'),
+          cases:{
+            nimetav: 'öökull', omastav: 'öökulli', osastav: 'öökulli', sisseütlev: 'öökulli',seesütlev: 'öökullis', seestütlev: 'öökullist', alaleütlev: 'öökullile', alalütlev: 'öökullil', alaltütlev: 'öökullilt', saav: 'öökulliks', rajav: 'öökullini', olev: 'öökullina', ilmaütlev: 'öökullita', kaasaütlev: 'öökulliga'
+          }
+        },
+    
+        { id: 14,
+          letter:'ü',
+          word:'ülikool',
+          translation:'University',
+          image: require('../../assets/images/uni.png'),
+          cases:{
+            nimetav: 'ülikool', omastav: 'ülikooli', osastav: 'ülikooli', sisseütlev: 'ülikooli',seesütlev: 'ülikoolis', seestütlev: 'ülikoolist', alaleütlev: 'ülikoolile', alalütlev: 'ülikoolil', alaltütlev: 'ülikoolilt', saav: 'ülikooliks', rajav: 'ülikoolini', olev: 'ülikoolina', ilmaütlev: 'ülikoolita', kaasaütlev: 'ülikooliga'
+          }
+        }
       ],
   
     3: [
+      { id: 15,
+        letter: 'B',
+        word: 'Banaan',
+        translation: 'Banana',
+        image: require('../../assets/images/banaan.png'),
+        cases: {
+          nimetav: 'Banaan', omastav: 'Banaani', osastav: 'Banaani', sisseütlev: 'banaani',seesütlev: 'Banaanis', seestütlev: 'Banaanist', alaleütlev: 'Banaanile', alalütlev: 'Banaanil', alaltütlev: 'Banaanilt', saav: 'Banaaniks', rajav: 'Banaanini', olev: 'Banaanina', ilmaütlev: 'Banaanita', kaasaütlev: 'Banaaniga'
+        }
+      },
+
+      { id: 16,
+        letter: 'D',
+        word: 'Diivan',
+        translation: 'Couch',
+        image: require('../../assets/images/diivan.png'),
+        cases: {
+          nimetav: 'Diivan', omastav: 'Diivani', osastav: 'Diivanit', sisseütlev: 'Diivanisse',seesütlev: 'Diivanis', seestütlev: 'Diivanist', alaleütlev: 'Diivanile', alalütlev: 'Diivanil', alaltütlev: 'Diivanilt', saav: 'Diivaniks', rajav: 'Diivanini', olev: 'Diivanina', ilmaütlev: 'Diivanita', kaasaütlev: 'Diivaniga'
+        }
+      },
+
+      { id: 17,
+        letter: 'G',
+        word: 'Gloobus',
+        translation: 'Globe',
+        image: require('../../assets/images/globe.png'),
+        cases: {
+          nimetav: 'Gloobus', omastav: 'Gloobuse', osastav: 'Gloobust', sisseütlev: 'Gloobusesse',seesütlev: 'Gloobuses', seestütlev: 'Gloobusest', alaleütlev: 'Gloobusele', alalütlev: 'Gloobusel', alaltütlev: 'Gloobuselt', saav: 'Gloobuseks', rajav: 'Gloobuseni', olev: 'Gloobusena', ilmaütlev: 'Gloobuseta', kaasaütlev: 'Gloobusega'
+        }
+      },
+
+      { id: 18,
+        letter: 'M',
+        word: 'Maasikas',
+        translation: 'Strawberry',
+        image: require('../../assets/images/maasikas.png'),
+        cases:{
+          nimetav: 'Maasikas', omastav: 'Maasika', osastav: 'Maasikat', sisseütlev: 'Maasikasse',seesütlev: 'Maasikas', seestütlev: 'Maasikast', alaleütlev: 'Maasikale', alalütlev: 'Maasikal', alaltütlev: 'Maasikalt', saav: 'Maasikaks', rajav: 'Maasikani', olev: 'Maasikana', ilmaütlev: 'Maasikata', kaasaütlev: 'Maasikaga'
+        }
+      },
+
+      { id: 19,
+        letter:'R',
+        word:'Roos',
+        translation:'Rose',
+        image: require('../../assets/images/rose.png'),
+        cases:{
+          nimetav: 'Roos', omastav: 'Roosi', osastav: 'Roosi', sisseütlev: 'Roosi',seesütlev: 'Roosis', seestütlev: 'Roosist', alaleütlev: 'Roosile', alalütlev: 'Roosil', alaltütlev: 'Roosilt', saav: 'Roosiks', rajav: 'Roosini', olev: 'Roosina', ilmaütlev: 'Roosita', kaasaütlev: 'Roosiga'
+        }
+      },
+
+      { id: 20,
+        letter:'V',
+        word:'Vaas',
+        translation:'Vase',
+        image: require('../../assets/images/vaas.png'),
+        cases:{
+          nimetav: 'Vaas', omastav: 'Vaasi', osastav: 'Vaasi', sisseütlev: 'Vaasi',seesütlev: 'Vaasis', seestütlev: 'Vaasist', alaleütlev: 'Vaasile', alalütlev: 'Vaasil', alaltütlev: 'Vaasilt', saav: 'Vaasiks', rajav: 'Vaasini', olev: 'Vaasina', ilmaütlev: 'Vaasita', kaasaütlev: 'Vaasiga'
+        }
+      },
+
       { id: 21,
         letter:'Z',
         word:'Zoo',
-        translation:'Zoo',},
-  
+        translation:'Zoo',
+        image: require('../../assets/images/zoo.png'),
+        cases:{
+          nimetav: 'Zoo', omastav: 'Zoo', osastav: 'Zood', sisseütlev: 'Zoosse',seesütlev: 'Zoos', seestütlev: 'Zoost', alaleütlev: 'Zoole', alalütlev: 'Zool', alaltütlev: 'Zoolt', saav: 'Zooks', rajav: 'Zooni', olev: 'Zoona', ilmaütlev: 'Zoota', kaasaütlev: 'Zooga'
+        }
+      },
       { id: 22,
         letter: 'ž',
         word: 'žürii',
-        translation: 'Jury',},
-  
+        translation: 'Jury',
+        image: require('../../assets/images/jury.png'),
+        cases:{
+          nimetav: 'žürii', omastav: 'žürii', osastav: 'žüriid', sisseütlev: 'žüriisse',seesütlev: 'žüriis', seestütlev: 'žüriist', alaleütlev: 'žüriile', alalütlev: 'žüriil', alaltütlev: 'žüriilt', saav: 'žüriiks', rajav: 'žüriini', olev: 'žüriina', ilmaütlev: 'žüriita', kaasaütlev: 'žüriiga'
+        }
+      },
       { id: 23,
-        letter:'T',
-        word:'Tramm',
-        translation:'Tram',},
-  
-      { id: 24,
-        letter:'U',
-        word:'Uks',
-        translation:'Door',},
-  
-      { id: 25,
-        letter:'V',
-        word:'Vihm',
-        translation:'Rain',},
-  
-      { id: 26,
-        letter:'õ',
-        word:'õun',
-        translation:'Apple',},
-  
-      { id: 27,
-        letter:'ä',
-        word:'ämblik',
-        translation:'Spider',},
-  
-      { id: 28,
-        letter:'ö',
-        word:'öökull',
-        translation:'Owl',},
-  
-      { id: 29,
-        letter:'ü',
-        word:'ülikool',
-        translation:'University',},
-  
-      { id: 30,
-        letter:'X',
-        word:'Xylofon',
-        translation:'Xylophone',},
-  
-      { id: 31,
-        letter:'W',
-        word: 'Washington',
-        translation: 'Washington',},
-  
-      { id: 32,
-        letter:'Y',
-        word:'York',
-        translation:'York',},
+        letter:'š',
+        word:'šokolaad',
+        translation:'Chocolate',
+        image: require('../../assets/images/shokolaad.png'),
+        cases:{
+          nimetav: 'šokolaad', omastav: 'šokolaadi', osastav: 'šokolaadi', sisseütlev: 'šokolaadi', seesütlev: 'šokolaadis', seestütlev: 'šokolaadist', alaleütlev: 'šokolaadile', alalütlev: 'šokolaadil', alaltütlev: 'šokolaadilt', saav: 'šokolaadiks', rajav: 'šokolaadini', olev: 'šokolaadina', ilmaütlev: 'šokolaadita', kaasaütlev: 'šokolaadiga'
+        }
+      },
     ],
-    4: [
+    4:[
+      {
+        id: 1,
+        word: 'üks',
+        translation: 'One',
+      },
+      {
+        id: 2,
+        word: 'Kaks',
+        translation: 'Two',
+      },
+      {
+        id: 3,
+        word: 'Kolm',
+        translation: 'Three',
+      },
+      {
+        id: 4,
+        word: 'Neli',
+        translation: 'Four',
+      },
+      {
+        id: 5,
+        word: 'Viis',
+        translation: 'Five',
+      },
+      {
+        id: 6,
+        word: 'Kuus',
+        translation: 'Six',
+      },
+      {
+        id: 7,
+        word: 'Seitse',
+        translation: 'Seven',
+      },
+      {
+        id: 8,
+        word: 'Kaheksa',
+        translation: 'Eight',
+      },
+      {
+        id: 9,
+        word: 'Üheksa',
+        translation: 'Nine',
+      },
+      {
+        id: 10,
+        word: 'Kümme',
+        translation: 'Ten',
+      }
+    ],
+    5: [
       { 
         id: 1,
         word: 'Tere',
@@ -358,7 +496,7 @@ export const lessonsData = {
       }
 
     ],
-    5:[
+    6:[
       {
         id: 1,
         word: 'Esmaspäev',
@@ -395,7 +533,7 @@ export const lessonsData = {
         translation: 'Sunday',
       }
     ],
-    6:[
+    7:[
       {
         id: 1,
         word: 'Päike',
@@ -451,6 +589,58 @@ export const lessonsData = {
         word:'Külm',
         translation:'Cold',
       },
+    ],
+    8:[
+      {
+        id: 1,
+        word: 'Vesi',
+        translation: 'Water',
+      },
+      {
+        id: 2,
+        word: 'Piim',
+        translation: 'Milk',
+      },
+      {
+        id: 3,
+        word: 'Leib',
+        translation: 'Bread',
+      },
+      {
+        id: 4,
+        word: 'Liha',
+        translation: 'Meat',
+      },
+      {
+        id: 5,
+        word: 'Kala',
+        translation: 'Fish',
+      },
+      {
+        id: 6,
+        word: 'Muna',
+        translation: 'Egg',
+      },
+      {
+        id: 7,
+        word: 'Juust',
+        translation: 'Cheese',
+      },
+      {
+        id: 8,
+        word: 'Puuvili',
+        translation: 'Fruit',
+      },
+      {
+        id: 9,
+        word: 'Köögivili',
+        translation: 'Vegetable',
+      },
+      {
+        id: 10,
+        word: 'Magustoit',
+        translation: 'Dessert',
+      }
     ]
     },
   2: {
@@ -1588,3 +1778,65 @@ export const lessonsData = {
     ]
   }
   }
+
+
+  /**
+  
+  
+        
+   { id: 11,
+          letter: 'K',
+          word: 'Kass',
+          translation: 'Cat',
+          image: require('../../assets/images/cat.png'),
+          cases:{
+            nimetav: 'Kass', omastav: 'Kassi', osastav: 'Kassi', sisseütlev: 'Kassi',seesütlev: 'Kassis', seestütlev: 'Kassist', alaleütlev: 'Kassile', alalütlev: 'Kassil', alaltütlev: 'Kassilt', saav: 'Kassiks', rajav: 'Kassini', olev: 'Kassina', ilmaütlev: 'Kassita', kaasaütlev: 'Kassiga'
+          }
+        },
+  
+    
+  
+        { id: 14,
+          letter: 'C',
+          word: 'Cola',
+          translation: 'Cola',
+          image: require('../../assets/images/cola.png'),
+          cases: {
+            nimetav: 'Cola', omastav: 'Cola', osastav: 'Colat', sisseütlev: 'Colasse',seesütlev: 'Colas', seestütlev: 'Colast', alaleütlev: 'Colale', alalütlev: 'Colal', alaltütlev: 'Colalt', saav: 'Colaks', rajav: 'Colani', olev: 'Colana', ilmaütlev: 'Colata', kaasaütlev: 'Colaga'
+          }
+        },
+  
+        { id: 16,
+          letter:'P',
+          word:'Päike',
+          translation:'Sun',
+          image: require('../../assets/images/paike.png'),
+          cases:{
+            nimetav: 'Päike', omastav: 'Päikese', osastav: 'Päikest', sisseütlev: 'Päikesesse',seesütlev: 'Päikeses', seestütlev: 'Päikesest', alaleütlev: 'Päikesele', alalütlev: 'Päikesel', alaltütlev: 'Päikeselt', saav: 'Päikeseks', rajav: 'Päikeseni', olev: 'Päikesena', ilmaütlev: 'Päikeseta', kaasaütlev: 'Päikesega'
+          }
+        },
+        
+        
+        { id: 18,
+          letter:'S',
+          word:'Sall',
+          translation:'Scarf',
+          image: require('../../assets/images/sall.png'),
+          cases:{
+            nimetav: 'Sall', omastav: 'Salli', osastav: 'Salli', sisseütlev: 'Salli',seesütlev: 'Sallis', seestütlev: 'Sallist', alaleütlev: 'Sallile', alalütlev: 'Sallil', alaltütlev: 'Sallilt', saav: 'Salliks', rajav: 'Sallini', olev: 'Sallina', ilmaütlev: 'Sallita', kaasaütlev: 'Salliga'
+          }
+        },
+  
+       
+     
+         
+       { id: 22,
+        letter:'T',
+        word:'Tramm',
+        translation:'Tram',
+        image: require('../../assets/images/tram.png'),
+        cases:{
+          nimetav: 'Tramm', omastav: 'Trammi', osastav: 'Trammi', sisseütlev: 'Trammi',seesütlev: 'Trammis', seestütlev: 'Trammist', alaleütlev: 'Trammile', alalütlev: 'Trammil', alaltütlev: 'Trammilt', saav: 'Trammiks', rajav: 'Trammini', olev: 'Trammina', ilmaütlev: 'Trammita', kaasaütlev: 'Trammiga'
+        }
+      },
+   */
