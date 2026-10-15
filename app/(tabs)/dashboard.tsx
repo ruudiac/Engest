@@ -7,6 +7,10 @@ import React, { useState } from "react";
 import { supabase } from '../../lib/supabase'
 import { images } from '../../lib/images'
 import PixelProgress from '../../components/pixelProgress'
+import Ionicons from '@expo/vector-icons/Ionicons';
+import Bobbing from '../../components/bobbing'
+
+const UNLOCK_ALL = false
 
 
 const moduleStyles = [
@@ -56,11 +60,12 @@ export default function Dashboard() {
   const [modules, setModules] = useState<any[]>([])
   const [completedCounts, setCompletedCounts] = useState<Record<number, number>>({})
   const currentLevel = Math.floor(totalXP / 100) + 1
+  const [completed, setCompleted] = useState<string[]>([])
 
   useEffect(() => {
     supabase
       .from('modules')
-      .select('*, lessons(lesson_number)')
+      .select('*, lessons(lesson_number, name)')
       .order('id')
       .then(({ data }) => { if (data) setModules(data) })
   }, [])
@@ -68,19 +73,40 @@ export default function Dashboard() {
   useEffect(() => {
     const loadAllCompleted = async () => {
       const counts: Record<number, number> = {}
+      const done: string[] = []
       for (const module of modules) {
         const lessons = module.lessons ?? []
         let count = 0
         for (const lesson of lessons) {
           const result = await AsyncStorage.getItem(`completed_${module.id}_${lesson.lesson_number}`)
-          if (result === 'true') count++
-        }
+          if (result === 'true') {
+            count++
+            done.push(`${module.id}_${lesson.lesson_number}`)
+          }   
+        }   
         counts[module.id] = count
-      }
+      }  
       setCompletedCounts(counts)
+      setCompleted(done)
     }
     loadAllCompleted()
   }, [modules])
+
+let next: any = null
+for (const m of modules) {
+  const lessons = [...(m.lessons ?? [])].sort((a, b) => a.lesson_number - b.lesson_number)
+  const lesson = lessons.find(l => !completed.includes(`${m.id}_${l.lesson_number}`))
+  if (lesson) {
+    next = { module: m, lesson, total: lessons.length }
+    break
+  }
+}
+const isUnlocked = (index: number) => {
+  if (UNLOCK_ALL || index === 0) return true
+  const prev = modules[index - 1]
+  return (completedCounts[prev.id] ?? 0) >= (prev.lessons?.length ?? 0)
+}
+
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-[#EAD4F6] items-center px-6">
     <View className=" flex-row items-center gap-5"> 
@@ -107,11 +133,55 @@ export default function Dashboard() {
   </Pressable>
 </View>
 
+{/* Continue card */}
+{next ? (
+  <View
+    className="w-full bg-[#543666] rounded-3xl p-4 mt-4 flex-row items-center"
+    style={inputStyle}
+  >
+    <View className="flex-1 pr-2">
+      <Text className="font-pixel text-[#F3DEFF] text-lg">Jätka õppimist</Text>
+      <Text className="font-inter text-[#CF8DF5] text-xs mt-1" numberOfLines={1}>
+        {next.module.name} · Lesson {next.lesson.lesson_number} of {next.total}
+      </Text>
+      <Text className="font-inter font-bold text-white text-base mt-1" numberOfLines={1}>
+        {next.lesson.name}
+      </Text>
+      <View className="mt-3">
+        <PixelProgress total={next.total} done={completedCounts[next.module.id] ?? 0} />
+      </View>
+      <Pressable
+        onPress={() => router.push({
+          pathname: '/lesson',
+          params: { moduleId: next.module.id, lessonId: next.lesson.lesson_number },
+        })}
+        className="mt-3 self-start flex-row items-center gap-2 bg-[#F3DEFF] rounded-xl px-4 py-2"
+      >
+        <Text className="font-pixel text-[#543666] text-base">Jätka</Text>
+        <Ionicons name="play" size={14} color="#543666" />
+      </Pressable>
+    </View>
+    <Bobbing>
+    <Image
+      source={require('../../assets/images/flowerlogo.png')}
+      style={{ width: 110, height: 110 }}
+      resizeMode="contain"
+    />
+    </Bobbing>
+  </View>
+) : (
+  <View className="w-full bg-[#543666] rounded-3xl p-4 mt-4" style={inputStyle}>
+    <Text className="font-pixel text-[#F3DEFF] text-lg">Kõik tehtud! 🎉</Text>
+    <Text className="font-inter text-[#CF8DF5] text-sm mt-1">You've finished every lesson.</Text>
+  </View>
+)}
+
 <View className='w-full'>
     <Text className="font-pixel text-black text-3xl mr-5 mt-4 w-full text-left">
         Learning modules
       </Text>
     </View>
+
 
     <FlatList 
     contentContainerStyle={{ paddingBottom: 24 }}
@@ -120,10 +190,12 @@ export default function Dashboard() {
     data={modules}
     numColumns={2}
     keyExtractor={(item) => item.id.toString()}
-    renderItem={({ item }) => (
+    renderItem={({ item, index }) => {
+      const unlocked = isUnlocked(index)
+      return (
       <Pressable
-        onPress={() => router.push({ pathname: '/module', params: { id: item.id, name: item.name } })}
-        className='bg-[#E2BFF6] border border-[#543666] rounded-3xl m-2 p-4 flex-1 items-center'
+        onPress={() => router.push({ pathname: '/module', params: { id: item.id, name: item.name } })}disabled={!unlocked}
+        className={`bg-[#E2BFF6] border border-[#543666] rounded-3xl m-2 p-4 flex-1 items-center ${unlocked ? '' : 'opacity-50'}`}
         style={inputStyle}
       >
         <View style={{ width: 64, height: 64 }} className="items-center justify-center rounded-full bg-[#F3DEFF] border border-[#543666] overflow-hidden">
@@ -138,11 +210,16 @@ export default function Dashboard() {
         </View>
         <Text className='font-pixel text-black text-base mt-3' numberOfLines={1}>{item.name}</Text>
         <Text className='font-pixel text-[#A35C83] text-xs' numberOfLines={1}>{item.subtitle}</Text>
-        <View className="mt-auto pt-3 w-full">
-          <PixelProgress total={item.lessons?.length ?? 0} done={completedCounts[item.id] ?? 0} />
-        </View>
+        <View className="mt-auto pt-3 w-full items-center">
+  {unlocked ? (
+    <PixelProgress total={item.lessons?.length ?? 0} done={completedCounts[item.id] ?? 0} />
+  ) : (
+    <Ionicons name="lock-closed" size={22} color="#543666" />
+  )}
+</View>
       </Pressable>
-    )}/>
+    )
+    }}/>
 
     </SafeAreaView>
   );
