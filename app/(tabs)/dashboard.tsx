@@ -1,8 +1,7 @@
 import { View, Text, Pressable, Image, FlatList} from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { use, useEffect } from 'react'
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect} from "react";
 import { supabase } from '../../lib/supabase'
 import { images } from '../../lib/images'
 import PixelProgress from '../../components/pixelProgress'
@@ -10,7 +9,6 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Bobbing from '../../components/bobbing'
 import StreetStrip from '../../components/street'
 
-const UNLOCK_ALL = false
 
 
 const moduleStyles = [
@@ -61,6 +59,7 @@ export default function Dashboard() {
   const [completedCounts, setCompletedCounts] = useState<Record<number, number>>({})
   const currentLevel = Math.floor(totalXP / 100) + 1
   const [completed, setCompleted] = useState<string[]>([])
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     supabase
@@ -70,7 +69,7 @@ export default function Dashboard() {
       .then(({ data }) => { if (data) setModules(data) })
   }, [])
 
-  useEffect(
+  useFocusEffect(
     useCallback(() => {
       const loadProgress = async () => {
         const { data: rows } = await supabase
@@ -90,10 +89,12 @@ export default function Dashboard() {
         if (user) {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('xp')
+            .select('xp, is_admin')
             .eq('id', user.id)
             .single()
-          setTotalXP(profile?.xp ?? 0)
+            
+            setTotalXP(profile?.xp ?? 0)
+            setIsAdmin(profile?.is_admin ?? false)
         }
       }
       loadProgress()},
@@ -110,7 +111,7 @@ for (const m of modules) {
   }
 }
 const isUnlocked = (index: number) => {
-  if (UNLOCK_ALL || index === 0) return true
+  if (isAdmin || index === 0) return true
   const prev = modules[index - 1]
   return (completedCounts[prev.id] ?? 0) >= (prev.lessons?.length ?? 0)
 }
