@@ -3,8 +3,9 @@ import Entypo from '@expo/vector-icons/Entypo';
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from 'expo-router';
 import React, { useState } from "react";
-import { Alert, Image, Pressable, Text, TextInput, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from '@/lib/supabase';
 
 export default function AuthScreen() {
   const [activeTab, setActiveTab] = useState("login");
@@ -12,6 +13,7 @@ export default function AuthScreen() {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const inputStyle = {
     shadowColor: '#7F39A6',
@@ -25,25 +27,52 @@ export default function AuthScreen() {
     console.log("Forgot password pressed");
   }
 
-  const handleSubmit = () => {
-    if (activeTab ==='signup' && password !== confirmPassword) {
-      Alert.alert("Passwords don't match");
+  const handleSubmit = async () => {
+    if (!email || !password) {
+      Alert.alert('Please  fill in email and password');
       return;
     }
-    console.log("Email", email);
-    console.log("Password", password);
-    console.log("Confirm Password", confirmPassword);
+      if (activeTab === 'signup') {
+        if(!username) {
+          Alert.alert('Please choose a username');
+          return;
+        }
+        if (password !== confirmPassword) {
+          Alert.alert('Passwords do not match');
+          return;
+        }
+    }
+
+    setLoading(true);
+    const { error } =
+    activeTab === 'signup'
+    ? await supabase.auth.signUp({email: email.trim(), password, options: {data: {username: username.trim() }},})
+    : await supabase.auth.signInWithPassword({email: email.trim(), password});
+    setLoading(false);
+
+    if (error){
+      Alert.alert(activeTab === 'signup' ? 'Signup failed' : 'Login failed', error.message);
+      return;
+    }
+
     router.replace('/(tabs)/dashboard' as any);
   };
-
   const handleGoogle = () => {
     console.log("Google sign in pressed");
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#EAD4F6] items-center justify-center w-full">
+    <SafeAreaView className="flex-1 bg-[#EAD4F6]">
+      <KeyboardAvoidingView style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 24 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
   
-      <View style={{ width: 200, height: 200, borderRadius: 999 }} className="bg-[#E2BFF6] overflow-hidden mb-4 mt-2" >
+      <View style={{ width: 140, height: 140, borderRadius: 999 }} className="bg-[#E2BFF6] overflow-hidden mb-4 mt-2" >
         <Image source={require('../assets/images/wavinglogo.png')}
         className="w-full h-full"
         resizeMode="contain" />
@@ -189,7 +218,10 @@ export default function AuthScreen() {
             </View>
 
         )}
-        </SafeAreaView>
+        </ScrollView>
+        </KeyboardAvoidingView>
+  </SafeAreaView>
+
   );
 
 }
