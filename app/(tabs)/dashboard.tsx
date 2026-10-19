@@ -9,6 +9,7 @@ import { images } from '../../lib/images'
 import PixelProgress from '../../components/pixelProgress'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Bobbing from '../../components/bobbing'
+import StreetStrip from '../../components/street'
 
 const UNLOCK_ALL = false
 
@@ -109,9 +110,16 @@ const isUnlocked = (index: number) => {
 
   return (
     <SafeAreaView edges={['top']} className="flex-1 bg-[#EAD4F6] items-center px-6">
+      <View
+    pointerEvents="none"
+    style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}
+  >
+    <StreetStrip />
+  </View>
     <View className=" flex-row items-center gap-5"> 
         <Text className=" flex-2 text-center font-pixel text-5xl mt-4">Dashboard</Text>
     </View>
+    
 
     <View className="flex-row items-center justify-between w-full mt-2 mb-2">
   <Pressable onPress={level} className="flex-row items-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2" style={{ width: 130, ...inputStyle }}>
@@ -184,7 +192,7 @@ const isUnlocked = (index: number) => {
 
 
     <FlatList 
-    contentContainerStyle={{ paddingBottom: 24 }}
+    contentContainerStyle={{ paddingBottom: 110 }}
     showsVerticalScrollIndicator={false}
     className='w-full'
     data={modules}
