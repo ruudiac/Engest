@@ -11,6 +11,7 @@ import StreetStrip from '../../components/street'
 
 
 
+
 const moduleStyles = [
   {
     id: 1,
@@ -60,6 +61,7 @@ export default function Dashboard() {
   const currentLevel = Math.floor(totalXP / 100) + 1
   const [completed, setCompleted] = useState<string[]>([])
   const [isAdmin, setIsAdmin] = useState(false)
+  const [coins, setCoins] = useState(0);
 
   useEffect(() => {
     supabase
@@ -84,17 +86,18 @@ export default function Dashboard() {
         setCompleted(done)
         setCompletedCounts(counts)
   
-        // XP for the level pill
+   
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('xp, is_admin')
+            .select('xp, is_admin, coins')
             .eq('id', user.id)
             .single()
-            
+
             setTotalXP(profile?.xp ?? 0)
             setIsAdmin(profile?.is_admin ?? false)
+            setCoins(profile?.coins ?? 0)
         }
       }
       loadProgress()},
@@ -145,7 +148,7 @@ const isUnlocked = (index: number) => {
 
   <Pressable onPress={level} className="flex-row items-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2 gap-2" style={{ width: 100, ...inputStyle }}>
     <Image source={require('../../assets/images/moneystack.png')} style={{ width: 28, height: 28 }} resizeMode="contain"/>
-    <Text className="font-pixel text-black text-base">100</Text>
+    <Text className="font-pixel text-black text-base">{coins}</Text>
   </Pressable>
 </View>
 

@@ -1,13 +1,14 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { Pressable, Text, View, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { supabase } from '@/lib/supabase';
 
 
 export default function Complete() {
   const { mistakes, total, moduleId, lessonId, moduleName } = useLocalSearchParams();
+  const [coinsEarned, setCoinsEarned] = useState<number | null>(null)
 
   const xp = Math.round((Number(total) - Number(mistakes)) / Number(total) * 25)
   const score = Math.round((Number(total) - Number(mistakes)) / Number(total) * 100)
@@ -37,13 +38,18 @@ export default function Complete() {
 
         const{ data: profile } = await supabase
         .from('profiles')
-        .select('xp')
+        .select('xp, coins')
         .eq('id', user.id)
         .single()
 
+        const coinsEarned = (existing ? 2 : 10) + (score === 100 ? 5 : 0)
+        setCoinsEarned(coinsEarned)
+
         const { error: xpError } = await supabase  
         .from('profiles')
-        .update({ xp: (profile?.xp ?? 0) + xp })
+        .update({ 
+          xp: (profile?.xp ?? 0) + xp,
+          coins: (profile?.coins ?? 0) + coinsEarned })
         .eq ('id', user.id)
         if (xpError) console.log('xp save failed', xpError.message)
       
@@ -84,6 +90,16 @@ export default function Complete() {
           </View>
           <Text className="text-4xl font-pixel text-[#543666]">{score}%</Text>
           <Text className="text-sm font-medium font-inter text-[#875BA1]">Score</Text>
+        </View>
+
+        <View className="flex-1 bg-[#FBF5FF] border-2 border-[#EBD5F7] rounded-3xl py-5 items-center gap-2">
+          <View className="w-11 h-11 rounded-full bg-[#E2BFF6] items-center justify-center">
+            <Image source={require('../assets/images/moneystack.png')} style={{ width: 26, height: 26 }} resizeMode="contain" />
+          </View>
+          <Text className="text-4xl font-pixel text-[#543666]">
+            {coinsEarned === null ? '…' : `+${coinsEarned}`}
+          </Text>
+          <Text className="text-sm font-medium font-inter text-[#875BA1]">Coins</Text>
         </View>
       </View>
   
