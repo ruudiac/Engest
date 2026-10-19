@@ -1,10 +1,9 @@
 import { View, Text, FlatList, Pressable, Image } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams, router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Foundation from '@expo/vector-icons/Foundation';
-import React, { useState, useEffect, useRef } from "react";
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from '../lib/supabase'
 import { images } from '../lib/images'
 
@@ -29,19 +28,15 @@ useEffect(() => {
     .then(({ data }) => { if (data) setLessons(data) })
 }, [])
 
-useEffect(() => {
-  const loadCompleted = async () => {
-    let count = 0
-    for (const lesson of lessons) {
-      const result = await AsyncStorage.getItem(`completed_${id}_${lesson.lesson_number}`)
-      if (result === 'true') {
-        count = count + 1
-      }
-    }
-    setCompletedCount(count)
-  }
-  loadCompleted()
-}, [lessons])
+useFocusEffect(
+  useCallback(() => {
+    supabase
+      .from('progress')
+      .select('lesson_number')
+      .eq('module_id', Number(id))
+      .then(({ data }) => setCompletedCount(data?.length ?? 0))
+  }, [id])
+)
  
 
 return (

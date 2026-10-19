@@ -1,9 +1,8 @@
 import { View, Text, Pressable, Image, FlatList} from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useEffect } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import React, { useState } from "react";
+import { use, useEffect } from 'react'
+import React, { useState, useCallback } from "react";
 import { supabase } from '../../lib/supabase'
 import { images } from '../../lib/images'
 import PixelProgress from '../../components/pixelProgress'
@@ -71,27 +70,35 @@ export default function Dashboard() {
       .then(({ data }) => { if (data) setModules(data) })
   }, [])
 
-  useEffect(() => {
-    const loadAllCompleted = async () => {
-      const counts: Record<number, number> = {}
-      const done: string[] = []
-      for (const module of modules) {
-        const lessons = module.lessons ?? []
-        let count = 0
-        for (const lesson of lessons) {
-          const result = await AsyncStorage.getItem(`completed_${module.id}_${lesson.lesson_number}`)
-          if (result === 'true') {
-            count++
-            done.push(`${module.id}_${lesson.lesson_number}`)
-          }   
-        }   
-        counts[module.id] = count
-      }  
-      setCompletedCounts(counts)
-      setCompleted(done)
-    }
-    loadAllCompleted()
-  }, [modules])
+  useEffect(
+    useCallback(() => {
+      const loadProgress = async () => {
+        const { data: rows } = await supabase
+        .from('progress')
+        .select('module_id, lesson_number')
+
+        const done = (rows ?? []).map(r => `${r.module_id}_${r.lesson_number}`)
+        const counts: Record<number, number> = {}
+        for (const r of rows ?? []) {
+          counts[r.module_id] = (counts[r.module_id] ?? 0) + 1
+        }
+        setCompleted(done)
+        setCompletedCounts(counts)
+  
+        // XP for the level pill
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('xp')
+            .eq('id', user.id)
+            .single()
+          setTotalXP(profile?.xp ?? 0)
+        }
+      }
+      loadProgress()},
+      []))
+  
 
 let next: any = null
 for (const m of modules) {

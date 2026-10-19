@@ -1,11 +1,10 @@
-import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
-import Feather from '@expo/vector-icons/Feather';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Pressable, Text, View, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { supabase } from '@/lib/supabase';
+
 
 export default function Complete() {
   const { mistakes, total, moduleId, lessonId, moduleName } = useLocalSearchParams();
@@ -14,14 +13,42 @@ export default function Complete() {
   const score = Math.round((Number(total) - Number(mistakes)) / Number(total) * 100)
 
   useEffect(() => {
-    const saveXP = async () => {
-      const current = await AsyncStorage.getItem('xp')
-      const currentXP = current ? Number(current) : 0
-      const newXP = currentXP + xp
-      await AsyncStorage.setItem('xp', String(newXP))
-      await AsyncStorage.setItem(`completed_${moduleId}_${lessonId}`, 'true')
+    const save = async () => {
+
+      const { data: { user }} = await supabase.auth.getUser()
+
+      if (!user) return 
+        const { data: existing } = await supabase
+        .from('progress')
+        .select('best_score')
+        .eq('user_id', user.id)
+        .eq('module_id', Number(moduleId))
+        .eq('lesson_number', Number(lessonId))
+        .maybeSingle()
+
+        const { error: progressError } = await supabase.from('progress').upsert({
+          user_id: user.id,
+          module_id: Number(moduleId),
+          lesson_number: Number(lessonId),
+          best_score: Math.max(score, existing?.best_score ?? 0),
+          completed_at: new Date().toISOString(),
+        })
+        if (progressError) console.log('progress save failed', progressError.message)
+
+        const{ data: profile } = await supabase
+        .from('profiles')
+        .select('xp')
+        .eq('id', user.id)
+        .single()
+
+        const { error: xpError } = await supabase  
+        .from('profiles')
+        .update({ xp: (profile?.xp ?? 0) + xp })
+        .eq ('id', user.id)
+        if (xpError) console.log('xp save failed', xpError.message)
+      
     }
-    saveXP()
+    save()
   }, [])
 
 
