@@ -1,6 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
-import * as FileSystem from 'expo-file-system/legacy';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from "react";
 import { Pressable, Text, View, Alert, Image } from 'react-native';
@@ -11,15 +10,7 @@ import { images } from '../lib/images';
 import { supabase } from '../lib/supabase';
 import { currentHearts, loseHeart } from '@/lib/hearts';
 
-const estonianLetterNames: Record<string, string> = {
-  'A': 'aa', 'B': 'bee', 'C': 'tsee', 'D': 'dee', 'E': 'ee',
-  'F': 'eff', 'G': 'gee', 'H': 'haa', 'I': 'ii', 'J': 'jott',
-  'K': 'kaa', 'L': 'ell', 'M': 'emm', 'N': 'enn', 'O': 'oo',
-  'P': 'pee', 'Q': 'kuu', 'R': 'err', 'S': 'ess', 'Š': 'šaa',
-  'Z': 'zett', 'Ž': 'žee', 'T': 'tee', 'U': 'uu', 'V': 'vee',
-  'W': 'kaksisvee', 'Õ': 'õõ', 'Ä': 'ää', 'Ö': 'öö', 'Ü': 'üü',
-  'X': 'iks', 'Y': 'igrek'
-}
+
 
 export default function Lesson() {
   const { moduleId, lessonId } = useLocalSearchParams();
@@ -88,75 +79,20 @@ export default function Lesson() {
     }
   check()
   },[])
-  
+
   useEffect(() => {
     if (!card) return
+    setAudioModeAsync({ playsInSilentMode: true }).catch(() => {})
 
-    
-  
-    const preload = async () => {
-      try {
-        await setAudioModeAsync({
-          playsInSilentMode: true,
-        })
-  
-        const fileUri =
-          (FileSystem as any).cacheDirectory +
-          `speech_${card.letter}_${card.word}_v2.wav`
+ 
+    const uri = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/audio/cards/${card.id}.mp3`
 
-  
-        const fileInfo = await (FileSystem as any).getInfoAsync(fileUri)
-  
-        if (!fileInfo.exists) {
-  
-          const text = card.letter
-          ?  `${estonianLetterNames[card.letter.toUpperCase()] ?? card.letter}. ${card.word}.`
-          :`${card.word}.`
-  
-          const response = await fetch(
-            'https://api.tartunlp.ai/text-to-speech/v2',
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                text,
-                speaker: 'mari',
-              }),
-            }
-          )
-  
-          const arrayBuffer = await response.arrayBuffer()
-          const bytes = new Uint8Array(arrayBuffer)
-  
-          let binary = ''
-  
-          for (let i = 0; i < bytes.byteLength; i++) {
-            binary += String.fromCharCode(bytes[i])
-          }
-  
-          const base64 = btoa(binary)
-  
-          await (FileSystem as any).writeAsStringAsync(
-            fileUri,
-            base64,
-            { encoding: 'base64' }
-          )
-        }
-  
-        if (!playerRef.current) {
-          playerRef.current = createAudioPlayer(fileUri)
-        } else {
-          playerRef.current.replace(fileUri)
-        }
-      } catch (error) {
-        console.log('Preload error:', error)
-      }
+    if (!playerRef.current) {
+      playerRef.current = createAudioPlayer(uri)
+    } else {
+      playerRef.current.replace(uri)
     }
-  
-    preload()
-  
+
     return () => {
       if (playerRef.current) {
         playerRef.current.remove()
