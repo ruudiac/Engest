@@ -3,12 +3,13 @@ import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
 import * as FileSystem from 'expo-file-system/legacy';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from "react";
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FlashcardMode from '../components/flashCardMode';
 import QuizMultipleChoice from '../components/quizMultipleChoice';
 import { images } from '../lib/images';
 import { supabase } from '../lib/supabase';
+import { currentHearts, loseHeart } from '@/lib/hearts';
 
 const estonianLetterNames: Record<string, string> = {
   'A': 'aa', 'B': 'bee', 'C': 'tsee', 'D': 'dee', 'E': 'ee',
@@ -22,14 +23,15 @@ const estonianLetterNames: Record<string, string> = {
 
 export default function Lesson() {
   const { moduleId, lessonId } = useLocalSearchParams();
-  const [lesson, setLesson] = useState<any>(null)
-  const [flashcards, setFlashcards] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [lesson, setLesson] = useState<any>(null);
+  const [flashcards, setFlashcards] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mode, setMode] = useState('flashcard');
   const playerRef = useRef<ReturnType<typeof createAudioPlayer> | null>(null);
-  const [mistakes, setMistakes] = useState(0)
+  const [mistakes, setMistakes] = useState(0);
+  const [outOfHearts, setOutOfHearts] = useState<number | null>(null);
 
   const inputStyle = {
     shadowColor: '#7F39A6',
@@ -68,6 +70,24 @@ export default function Lesson() {
         setLoading(false)
       })
   }, [])
+
+  useEffect(() =>{
+
+    const check = async () =>{
+      const {data: { user }} = await supabase.auth.getUser()
+      if (!user) return
+      const {data: p} = await supabase
+      .from('profiles')
+      .select('hearts, hearts_updated_at, is_admin')
+      .eq('id', user.id)
+      .single()
+
+      if (!p || p.is_admin) return
+      const h = currentHearts(p.hearts, p.hearts_updated_at)
+      if (h.hearts === 0) setOutOfHearts(h.nextInMs)
+    }
+  check()
+  },[])
   
   useEffect(() => {
     if (!card) return
@@ -158,6 +178,24 @@ export default function Lesson() {
   if (loading) {
     return <SafeAreaView className="flex-1 bg-[#F1D4FF]" />
   }
+  if (outOfHearts !== null){
+    return (
+      <SafeAreaView className="flex-1 bg-[#F1D4FF] px-6 items-center justify-center">
+        <Image source={require('../assets/images/_-2-removebg-preview.png')} style={{ width: 72, height: 72, opacity: 0.35 }} resizeMode="contain" />
+        <Text className="font-pixel text-3xl text-[#543666] mt-4">Südamed otsas!</Text>
+        <Text className="font-inter text-base text-[#875BA1] text-center mt-2">
+          You're out of hearts. Next one in {Math.ceil(outOfHearts / 60000)} min.
+        </Text>
+        <Pressable
+          onPress={() => router.back()}
+          className="h-14 mt-8 px-8 rounded-2xl items-center justify-center bg-[#543666]"
+        >
+          <Text className="text-lg font-semibold font-inter text-white">Back</Text>
+        </Pressable>
+      </SafeAreaView>
+    )
+  }
+
   if (notReady) {
     return (
       <SafeAreaView className="flex-1 bg-[#F1D4FF] px-6 items-center justify-center">
@@ -222,11 +260,18 @@ export default function Lesson() {
           card={card}
           flashcards={quizorder}
           speakWord={speakWord}
-          onNext={(wasCorrect: boolean) => {
+          onNext={async (wasCorrect: boolean) => {
             const finalMistakes = wasCorrect ? mistakes : mistakes + 1;
 
             if (!wasCorrect) {
               setMistakes(finalMistakes)
+              const left = await loseHeart()
+              if (left === 0){
+                Alert.alert('Südamed on otsas!', 'You ran out of hearts! Come back in 30 minutes.', 
+                [{text: 'OK', onPress: () => router.replace('/(tabs)/dashboard' as any)}
+                ]) 
+                return
+              }
             }
             if (currentIndex === flashcards.length - 1) {
               router.push({

@@ -33,7 +33,7 @@ export async function loseHeart(): Promise<number> {
     .from('profiles')
     .update({
       hearts: newHearts,
-      // full before this loss → the refill clock starts now
+   
       hearts_updated_at: new Date(hearts >= MAX_HEARTS ? Date.now() : clockStart).toISOString(),
     })
     .eq('id', user.id)

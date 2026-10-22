@@ -8,6 +8,7 @@ import PixelProgress from '../../components/pixelProgress'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Bobbing from '../../components/bobbing'
 import StreetStrip from '../../components/street'
+import { currentHearts, MAX_HEARTS } from '@/lib/hearts';
 
 
 
@@ -61,7 +62,8 @@ export default function Dashboard() {
   const currentLevel = Math.floor(totalXP / 100) + 1
   const [completed, setCompleted] = useState<string[]>([])
   const [isAdmin, setIsAdmin] = useState(false)
-  const [coins, setCoins] = useState(0);
+  const [ coins, setCoins] = useState(0);
+  const [hearts, setHearts] = useState(MAX_HEARTS);
 
   useEffect(() => {
     supabase
@@ -77,6 +79,7 @@ export default function Dashboard() {
         const { data: rows } = await supabase
         .from('progress')
         .select('module_id, lesson_number')
+      
 
         const done = (rows ?? []).map(r => `${r.module_id}_${r.lesson_number}`)
         const counts: Record<number, number> = {}
@@ -89,15 +92,20 @@ export default function Dashboard() {
    
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
-          const { data: profile } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .select('xp, is_admin, coins')
+            .select('xp, is_admin, coins, hearts, hearts_updated_at')
             .eq('id', user.id)
             .single()
+
 
             setTotalXP(profile?.xp ?? 0)
             setIsAdmin(profile?.is_admin ?? false)
             setCoins(profile?.coins ?? 0)
+            
+            if (profile) {
+              setHearts(profile.is_admin ? MAX_HEARTS : currentHearts(profile.hearts, profile.hearts_updated_at).hearts)
+            }
         }
       }
       loadProgress()},
@@ -141,9 +149,12 @@ const isUnlocked = (index: number) => {
   </Pressable>
 
   <Pressable onPress={level} className="flex-row items-center justify-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2" style={{ width: 110, ...inputStyle }}>
-    <Image source={require('../../assets/images/_-2-removebg-preview.png')} style={{ width: 28, height: 28 }} resizeMode="contain"/>
-    <Image source={require('../../assets/images/_-2-removebg-preview.png')} style={{ width: 28, height: 28 }} resizeMode="contain"/>
-    <Image source={require('../../assets/images/_-2-removebg-preview.png')} style={{ width: 28, height: 28 }} resizeMode="contain"/>
+    {Array.from({ length: MAX_HEARTS}).map((_, i) => (
+      <Image key={i}
+      source={require('../../assets/images/_-2-removebg-preview.png')}
+      style={{ width: 28, height: 28, opacity: i < hearts ? 1 : 0.25 }}
+      resizeMode="contain"/>
+    ))}
   </Pressable>
 
   <Pressable onPress={level} className="flex-row items-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2 gap-2" style={{ width: 100, ...inputStyle }}>
