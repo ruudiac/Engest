@@ -33,12 +33,16 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
       <Ionicons name="volume-high" size={24} color="#7F39A6" />
     </Pressable>
 
-    {card.letter ?(
+    {card.image ?(
       <>
         <View>
           <Image source={card.image} style={{ width: 250, height: 100}} resizeMode="contain"/>
         </View>
-        <Text allowFontScaling={false} className='text-5xl text-center font-bold text-[#543666] font-inter mt-7'>{card.letter}</Text>
+          {card.sound && (
+          <View className="self-center mt-5 px-4 py-1 rounded-full bg-[#F6E9FF] border-2 border-[#CF8DF5]">
+          <Text className="font-pixel text-2xl text-[#7F39A6]">{card.sound}</Text>
+          </View>
+   )}
         <Text allowFontScaling={false} className='mt-3 text-6xl font-inter text-center text-[#875BA1] font-bold'>{card.word}</Text>
         <Text allowFontScaling={false} className='mt-3 text-[#CF8DF5] text-4xl text-center font.bold font-inter'>{card.translation}</Text>
 

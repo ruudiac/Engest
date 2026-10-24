@@ -23,7 +23,9 @@
       "expo-image",
       "expo-splash-screen",
       "expo-web-browser",
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-status-bar",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true,
