@@ -33,17 +33,18 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
       <Ionicons name="volume-high" size={24} color="#7F39A6" />
     </Pressable>
 
-    {card.image ?(
-      <>
-        <View>
-          <Image source={card.image} style={{ width: 250, height: 100}} resizeMode="contain"/>
-        </View>
-          {card.sound && (
-          <View className="self-center mt-5 px-4 py-1 rounded-full bg-[#F6E9FF] border-2 border-[#CF8DF5]">
-          <Text className="font-pixel text-2xl text-[#7F39A6]">{card.sound}</Text>
-          </View>
+    {card.sound ? (
+  <View className="self-center mt-6 w-24 h-24 rounded-3xl bg-[#F6E9FF] border-2 border-[#CF8DF5] items-center justify-center">
+    <Text allowFontScaling={false} className="font-inter font-bold text-5xl text-[#7F39A6]">
+      {card.sound}
+    </Text>
+  </View>
+) : (
+     <View>
+       <Image source={card.image} style={{ width: 250, height: 100 }} resizeMode="contain" />
+     </View>
    )}
-        <Text allowFontScaling={false} className='mt-3 text-6xl font-inter text-center text-[#875BA1] font-bold'>{card.word}</Text>
+        <Text allowFontScaling={false} className='mt-3 text-6xl leading-[80px] font-inter text-center text-[#875BA1] font-bold'>{card.word}</Text>
         <Text allowFontScaling={false} className='mt-3 text-[#CF8DF5] text-4xl text-center font.bold font-inter'>{card.translation}</Text>
 
         <Pressable onPress= {() => setCasesOpen (!casesOpen) }
@@ -59,11 +60,6 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
             size={16}
             color={casesOpen ? '#F6E9FF' : '#7F39A6'}/>
         </Pressable>
-      </>
-    ) : (
-      <Text allowFontScaling={false} className='text-5xl text-center font-bold text-[#543666] font-inter mt-7'>{card.word}</Text>
-    )}
-  
     </View>
     
 {/* Buttons */}

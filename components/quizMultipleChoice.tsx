@@ -44,7 +44,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
     <View className='flex-1'>
       {/* Word card */}
       <View className='bg-[#E2BFF6] rounded-3xl mt-6 items-center justify-center mb-7' style={{ height: 300, ...cardStyle }}>
-        <Text className='text-6xl font-bold text-[#543666] font-inter'>{card.word}</Text>
+        <Text className='text-6xl font-bold text-[#543666] leading-[80px] font-inter'>{card.word}</Text>
         <Pressable onPress={speakWord} className="mt-4 w-12 h-12 rounded-full bg-[#F6E9FF] items-center justify-center">
           <Ionicons name="volume-high" size={24} color="#7F39A6" />
         </Pressable>
