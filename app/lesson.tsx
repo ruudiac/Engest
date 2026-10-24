@@ -102,6 +102,7 @@ export default function Lesson() {
   }, [card])
 
   const speakWord = async () => {
+    if (!card?.has_audio) return
     try {
       if (playerRef.current) {
         await playerRef.current.seekTo(0)

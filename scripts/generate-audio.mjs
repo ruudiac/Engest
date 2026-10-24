@@ -40,6 +40,7 @@ const { data: cards, error } = await supabase
   .from('cards')
   .select('id, word, lessons(module_id, lesson_number)')
   .order('id')
+  .eq('has_audio', true)
 if (error) { console.error('Could not read cards:', error.message); process.exit(1) }
 
 const todo = cards.filter(c =>

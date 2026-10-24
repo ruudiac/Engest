@@ -29,10 +29,11 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
 
     <View className='bg-[#E2BFF6] rounded-3xl m-8 p-6 pb-10 flex-1' style={cardStyle}>
     
-
+    {card.has_audio && (
     <Pressable onPress={speakWord} className="mt-4 w-12 h-12 rounded-full bg-[#F6E9FF] items-center justify-center">
       <Ionicons name="volume-high" size={24} color="#7F39A6" />
     </Pressable>
+    )}
 
     {card.sound ? (
      <View className="self-center mt-6 rounded-3xl bg-[#F6E9FF] border-2 border-[#CF8DF5] items-center justify-center"

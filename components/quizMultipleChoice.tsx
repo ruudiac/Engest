@@ -46,9 +46,13 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
       {/* Word card */}
       <View className='bg-[#E2BFF6] rounded-3xl mt-6 items-center justify-center mb-7 px-6' style={{ height: 300, ...cardStyle }}>
       <Text allowFontScaling={false} className="font-bold text-[#543666] font-inter text-center" style={wordStyle(card.word)}>{card.word}</Text>
+      
+      {card.has_audio && (
         <Pressable onPress={speakWord} className="mt-4 w-12 h-12 rounded-full bg-[#F6E9FF] items-center justify-center">
           <Ionicons name="volume-high" size={24} color="#7F39A6" />
         </Pressable>
+      )}
+
       </View>
 
       {/* Answer options */}
