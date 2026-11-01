@@ -33,7 +33,7 @@ if (!EXPO_PUBLIC_SUPABASE_URL || !SUPABASE_SECRET_KEY || !ELEVENLABS_API_KEY) {
 }
 
 const supabase = createClient(EXPO_PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY)
-const only = process.argv.slice(2).find(a => !a.startsWith('--')) // e.g. "1_1"
+const only = process.argv.slice(2).find(a => /^\d+_\d+$/.test(a)) // e.g. "1_1"
 
 // 1. All cards, with the module and lesson they belong to
 const { data: cards, error } = await supabase

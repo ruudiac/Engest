@@ -6,38 +6,54 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { supabase } from '../../lib/supabase';
 import Bobbing from '../../components/bobbing';
 import PixelProgress from '../../components/pixelProgress';
+import Room from '../../components/room';
+
 
 export default function Profile() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [xp, setXp] = useState(0);
   const [lessonsDone, setLessonsDone] = useState(0);
+  const [equipped, setEquipped] = useState<Record<string, string>>({});
 
+  const loadRoom = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const [{ data: items }, { data: mine }] = await Promise.all([
+      supabase.from('items').select('id, slot, image_key, is_default'),
+      supabase.from('user_items').select('item_id').eq('user_id', user.id).eq('equipped', true),
+    ]);
+    const map: Record<string, string> = {};
+    items?.filter(i => i.is_default).forEach(i => (map[i.slot] = i.image_key));
+    const ids = new Set(mine?.map(m => m.item_id));
+    items?.filter(i => ids.has(i.id)).forEach(i => (map[i.slot] = i.image_key));
+    setEquipped(map);
+  };
 
-useFocusEffect(
-  useCallback(() => {
-    const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      setEmail(user.email ?? '');
+  useFocusEffect(
+    useCallback(() => {
+      const load = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        setEmail(user.email ?? '');
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('username, xp')
-        .eq('id', user.id)
-        .single();
-      setUsername(profile?.username ?? '');
-      setXp(profile?.xp ?? 0);
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('username, xp')
+          .eq('id', user.id)
+          .single();
+        setUsername(profile?.username ?? '');
+        setXp(profile?.xp ?? 0);
 
-      // Only counts rows, doesn't download them
-      const { count } = await supabase
-        .from('progress')
-        .select('*', { count: 'exact', head: true });
-      setLessonsDone(count ?? 0);
-    };
-    load();
-  }, [])
-);
+        const { count } = await supabase
+          .from('progress')
+          .select('*', { count: 'exact', head: true });
+        setLessonsDone(count ?? 0);
+      };
+      load();
+      loadRoom();
+    }, [])
+  );
 
 const level = Math.floor(xp/100) + 1;
 const xpInLevel = xp % 100;
@@ -68,15 +84,13 @@ return (
       Profile
     </Text>
 
-    <View className="items-center mt-6">
-      <View style={{ width: 130, height: 130 }} className="rounded-full bg-[#E2BFF6] border-2 border-[#543666] items-center justify-center overflow-hidden">
-        <Bobbing>
-        <Image source={require('../../assets/images/flowerlogo.png')} style={{ width: 120, height: 120 }} resizeMode="contain"/>
-        </Bobbing>
-      </View>
-      <Text className="font-pixel text-3xl text-[#543666] mt-3">{username} </Text>
-      <Text className="font-inter text-sm text-[#875BA1]">{email}</Text>
-    </View>
+    <View style={{ marginHorizontal: -24, marginTop: -10, marginBottom: -30 }}>
+     <Room equipped={equipped} />
+   </View>
+   <View className="items-center">
+     <Text className="font-pixel text-3xl text-[#543666]">{username}</Text>
+     <Text className="font-inter text-sm text-[#875BA1]">{email}</Text>
+   </View>
 
     <View className="flex-row gap-3 mt-6">
       <Stat icon="star" value={level} label="Level" />
