@@ -38,7 +38,7 @@ export default function Complete() {
 
         const{ data: profile } = await supabase
         .from('profiles')
-        .select('xp, Kroonid')
+        .select('xp, coins')
         .eq('id', user.id)
         .single()
 
@@ -49,7 +49,7 @@ export default function Complete() {
         .from('profiles')
         .update({ 
           xp: (profile?.xp ?? 0) + xp,
-          Kroonid: (profile?.Kroonid ?? 0) + KroonidEarned })
+          coins: (profile?.coins ?? 0) + KroonidEarned })
         .eq ('id', user.id)
         if (xpError) console.log('xp save failed', xpError.message)
       

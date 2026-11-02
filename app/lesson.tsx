@@ -11,11 +11,12 @@ import { images } from "../lib/images";
 import { supabase } from "../lib/supabase";
 
 // Picks a random quiz type that this card can actually support
-const pickQuizType = (c: any) => {
+const pickQuizType = (c: any, prev: string) => {
   const types = ['et-en', 'en-et']
   if (c.has_audio) types.push('listen')
   if (c.image) types.push('picture')
-  return types[Math.floor(Math.random() * types.length)]
+  const options = types.filter((t) => t !== prev)
+  return options[Math.floor(Math.random() * options.length)]
 }
 
 export default function Lesson() {
@@ -202,11 +203,16 @@ export default function Lesson() {
           flashcards={flashcards}
           speakWord={speakWord}
           onPrevious={() => setCurrentIndex(currentIndex - 1)}
-          onNext={() => {
+                    onNext={() => {
             if (currentIndex === flashcards.length - 1) {
+              let prev = ''
               const shuffled = [...flashcards]
-              .sort(() => Math.random() - 0.5)
-              .map((c) => ({ ...c, quizType: pickQuizType(c) }));
+                .sort(() => Math.random() - 0.5)
+                .map((c) => {
+                  const quizType = pickQuizType(c, prev)
+                  prev = quizType
+                  return { ...c, quizType }
+                });
               setQuizOrder(shuffled);
               setCurrentIndex(0);
               setMode("quiz");
