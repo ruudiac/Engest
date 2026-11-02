@@ -10,11 +10,11 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
   const answer = card[answerKey]
 
   const options = useMemo(() => {
-    const others = flashcards
-      .filter((f: any) => f[answerKey] !== answer)
+
+    const others = [...new Set(flashcards.map((f: any) => f[answerKey]))]
+      .filter((v) => v !== answer)
       .sort(() => Math.random() - 0.5)
       .slice(0, 2)
-      .map((f: any) => f[answerKey])
 
     return [...others, answer].sort(() => Math.random() - 0.5)
   }, [card, type])

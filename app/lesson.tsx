@@ -52,6 +52,7 @@ export default function Lesson() {
   const card =
     mode === "quiz" ? quizorder[currentIndex] : flashcards[currentIndex];
   const notReady = !lesson || flashcards.length === 0;
+  const total = mode === "quiz" ? quizorder.length : flashcards.length;
 
   useEffect(() => {
     supabase
@@ -182,12 +183,12 @@ export default function Lesson() {
       </View>
 
       <Text className="text-right font-inter text-lg">
-        {currentIndex + 1}/{flashcards.length}
+        {currentIndex + 1}/{total}
       </Text>
 
       <View className="w-full h-9 border border-[#543666] bg-[#CF8DF5] rounded-full overflow-hidden">
         <View
-          style={{ width: `${(currentIndex / flashcards.length) * 100}%` }}
+          style={{ width: `${(currentIndex / total) * 100}%` }}
           className="h-9 bg-[#7F39A6]"
         />
       </View>
@@ -228,26 +229,33 @@ export default function Lesson() {
           flashcards={quizorder}
           speakWord={speakWord}
           onNext={async (wasCorrect: boolean) => {
-            const finalMistakes = wasCorrect ? mistakes : mistakes + 1;
+            // a card counts as a mistake, costs a heart, only first time it is anwered wrong
+            const firstMistake = !wasCorrect && !card.retry;
+            const finalMistakes = firstMistake ? mistakes + 1 : mistakes;
+
+            //anytime a card is answered wrong, goes back to the quiz queue, in a new quiz type
+            let order = quizorder;
 
             if (!wasCorrect) {
+              const last = quizorder[quizorder.length - 1];
+              order = [...quizorder, { ...card, retry: true, quizType: pickQuizType(card, last.quizType) }];
+              setQuizOrder(order);
+            }
+
+            if (firstMistake) {
               setMistakes(finalMistakes);
               const left = await loseHeart();
               if (left === 0) {
                 Alert.alert(
-                  "Südamed on otsas!",
-                  "You ran out of hearts! Come back in 30 minutes.",
-                  [
-                    {
-                      text: "OK",
-                      onPress: () => router.replace("/(tabs)/dashboard" as any),
-                    },
-                  ],
+                  "Südamed otsas!",
+                  "You're out of hearts. Come back in 30 minutes.",
+                  [{ text: "OK", onPress: () => router.replace("/(tabs)/dashboard" as any) }],
                 );
                 return;
               }
             }
-            if (currentIndex === flashcards.length - 1) {
+
+            if (currentIndex === order.length - 1) {
               router.push({
                 pathname: "/complete",
                 params: {
