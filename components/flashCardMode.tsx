@@ -27,28 +27,28 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
   return (
     <View className='flex-1'> 
 
-    <View className='bg-[#E2BFF6] rounded-3xl m-8 p-6 pb-10 flex-1' style={cardStyle}>
+    <View className='bg-[#E2BFF6] rounded-3xl m-8 p-6 pb-10 flex-1 justify-center' style={cardStyle}>
     
     {card.has_audio && (
-    <Pressable onPress={speakWord} className="mt-4 w-12 h-12 rounded-full bg-[#F6E9FF] items-center justify-center">
+    <Pressable onPress={speakWord} className="absolute top-6 left-6 w-12 h-12 rounded-full bg-[#F6E9FF] items-center justify-center z-10">
       <Ionicons name="volume-high" size={24} color="#7F39A6" />
     </Pressable>
     )}
 
-    {card.sound ? (
-     <View className="self-center mt-6 rounded-3xl bg-[#F6E9FF] border-2 border-[#CF8DF5] items-center justify-center"
-       style={{ minWidth: 96, height: 96, paddingHorizontal: 20 }}>
-       <Text allowFontScaling={false} className="font-inter font-bold text-[#7F39A6]" style={soundStyle(card.sound)}>
-         {card.sound}
-       </Text>
-     </View>
-   ) : (
-     <View>
-       <Image source={card.image} style={{ width: 250, height: 100 }} resizeMode="contain" />
-     </View>
-   )}
-            <Text allowFontScaling={false} className="mt-3 font-inter text-center text-[#875BA1] font-bold" style={wordStyle(card.word)}>{card.word}</Text>
-            <Text allowFontScaling={false} className="mt-3 text-[#CF8DF5] text-center font-inter" style={translationStyle(card.translation)}>{card.translation}</Text>
+    {card.sound && (
+  <View className="self-center mt-0 mx-14 rounded-3xl bg-[#F6E9FF] border-2 border-[#CF8DF5] items-center justify-center"
+    style={{ minWidth: 80, height: 80, paddingHorizontal: 20 }}>
+    <Text allowFontScaling={false} numberOfLines={1} adjustsFontSizeToFit className="font-inter font-bold text-[#7F39A6]" style={soundStyle(card.sound)}>
+  {card.sound}
+</Text>
+  </View>
+)}
+{card.image && (
+  <Image source={card.image} style={{ width: 250, height: 75, alignSelf: 'center', marginTop: 12 }} resizeMode="contain" />
+)}
+            <Text allowFontScaling={false} numberOfLines={1} adjustsFontSizeToFit className="mt-3 font-inter text-center text-[#875BA1] font-bold" style={wordStyle(card.word)}>{card.word}</Text>
+            <Text allowFontScaling={false} className="mt-3 text-[#CF8DF5] text-center font-inter" style={translationStyle(card.translation)}>
+              {card.translation}</Text>
 
         <Pressable onPress= {() => setCasesOpen (!casesOpen) }
         className={`flex-row items-center self-center mt-4 px-5 py-2 rounded-full gap-2 ${

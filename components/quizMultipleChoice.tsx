@@ -1,22 +1,25 @@
 import React, { useState, useMemo } from "react";
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View, Image } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { wordStyle, translationStyle, soundStyle } from './wordSize';
 
-export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord }: any) {
+export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord, type = 'et-en' }: any) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
+
+  const answerKey = type === 'et-en' ? 'translation' : 'word'
+  const answer = card[answerKey]
 
   const options = useMemo(() => {
     const others = flashcards
-      .filter((f: any) => f.translation !== card.translation)
+      .filter((f: any) => f[answerKey] !== answer)
       .sort(() => Math.random() - 0.5)
       .slice(0, 2)
-      .map((f: any) => f.translation)
+      .map((f: any) => f[answerKey])
 
-    return [...others, card.translation].sort(() => Math.random() - 0.5)
-  }, [card])
+    return [...others, answer].sort(() => Math.random() - 0.5)
+  }, [card, type])
 
-  const isCorrect = selectedAnswer === card.translation
+  const isCorrect = selectedAnswer === answer
 
   const cardStyle = {
     shadowColor: '#9B59B6',
@@ -29,7 +32,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
 
   const getState = (option: string) => {
     if (!selectedAnswer) return 'idle'
-    if (option === card.translation) return 'correct'          
+    if (option === answer) return 'correct'          
     if (option === selectedAnswer) return 'wrong'              
     return 'dim'                                               
   }
@@ -44,13 +47,22 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
   return (
     <View className='flex-1'>
       {/* Word card */}
+
       <View className='bg-[#E2BFF6] rounded-3xl mt-6 items-center justify-center mb-7 px-6' style={{ height: 300, ...cardStyle }}>
-      <Text allowFontScaling={false} className="font-bold text-[#543666] font-inter text-center" style={wordStyle(card.word)}>{card.word}</Text>
+        {type === 'et-en' && (
+        <Text allowFontScaling={false} className="font-bold text-[#543666] font-inter text-center" style={wordStyle(card.word)}>{card.word}</Text>
+          )}
+        {type === 'en-et' && (
+        <Text allowFontScaling={false} className="font-bold text-[#543666] font-inter text-center" style={wordStyle(card.translation)}>{card.translation}</Text>
+          )}
+        {type === 'picture' && (
+        <Image source={card.image} style={{ width: 220, height: 220 }} resizeMode="contain" />
+      )}
       
-      {card.has_audio && (
-        <Pressable onPress={speakWord} className="mt-4 w-12 h-12 rounded-full bg-[#F6E9FF] items-center justify-center">
-          <Ionicons name="volume-high" size={24} color="#7F39A6" />
-        </Pressable>
+      {(type === 'et-en' || type === 'listen') && card.has_audio && (
+      <Pressable onPress={speakWord} className={`${type === 'listen' ? 'w-24 h-24' : 'mt-4 w-12 h-12'} rounded-full bg-[#F6E9FF] items-center justify-center`}>
+      <Ionicons name="volume-high" size={type === 'listen' ? 48 : 24} color="#7F39A6" />
+      </Pressable>
       )}
 
       </View>

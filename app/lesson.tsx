@@ -1,16 +1,22 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
-import { router, useLocalSearchParams } from 'expo-router';
+import { currentHearts, loseHeart } from "@/lib/hearts";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Pressable, Text, View, Alert, Image } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import FlashcardMode from '../components/flashCardMode';
-import QuizMultipleChoice from '../components/quizMultipleChoice';
-import { images } from '../lib/images';
-import { supabase } from '../lib/supabase';
-import { currentHearts, loseHeart } from '@/lib/hearts';
+import { Alert, Image, Pressable, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import FlashcardMode from "../components/flashCardMode";
+import QuizMultipleChoice from "../components/quizMultipleChoice";
+import { images } from "../lib/images";
+import { supabase } from "../lib/supabase";
 
-
+// Picks a random quiz type that this card can actually support
+const pickQuizType = (c: any) => {
+  const types = ['et-en', 'en-et']
+  if (c.has_audio) types.push('listen')
+  if (c.image) types.push('picture')
+  return types[Math.floor(Math.random() * types.length)]
+}
 
 export default function Lesson() {
   const { moduleId, lessonId } = useLocalSearchParams();
@@ -19,118 +25,130 @@ export default function Lesson() {
   const [loading, setLoading] = useState(true);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [mode, setMode] = useState('flashcard');
+  const [mode, setMode] = useState("flashcard");
   const playerRef = useRef<ReturnType<typeof createAudioPlayer> | null>(null);
   const [mistakes, setMistakes] = useState(0);
   const [outOfHearts, setOutOfHearts] = useState<number | null>(null);
 
   const inputStyle = {
-    shadowColor: '#7F39A6',
+    shadowColor: "#7F39A6",
     shadowOffset: { width: 1, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 4,
-  }
+  };
 
   const cardStyle = {
-    shadowColor: '#9B59B6',
+    shadowColor: "#9B59B6",
     shadowOffset: { width: 4, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 6,
     elevation: 8,
-  }
+  };
 
   const [quizorder, setQuizOrder] = useState(flashcards);
 
-  const card = mode === 'quiz' ? quizorder[currentIndex] : flashcards[currentIndex];
-  const notReady =!lesson || flashcards.length === 0;
+  const card =
+    mode === "quiz" ? quizorder[currentIndex] : flashcards[currentIndex];
+  const notReady = !lesson || flashcards.length === 0;
 
   useEffect(() => {
     supabase
-      .from('lessons')
-      .select('*, cards(*)')
-      .eq('module_id', Number(moduleId))
-      .eq('lesson_number', Number(lessonId))
-      .order('position', { referencedTable: 'cards' })
+      .from("lessons")
+      .select("*, cards(*)")
+      .eq("module_id", Number(moduleId))
+      .eq("lesson_number", Number(lessonId))
+      .order("position", { referencedTable: "cards" })
       .single()
       .then(({ data }) => {
         if (data) {
-          setLesson(data)
-          setFlashcards(data.cards.map((c: any) => ({ ...c, image: images[c.image_key] })))
+          setLesson(data);
+          setFlashcards(
+            data.cards.map((c: any) => ({ ...c, image: images[c.image_key] })),
+          );
         }
-        setLoading(false)
-      })
-  }, [])
-
-  useEffect(() =>{
-
-    const check = async () =>{
-      const {data: { user }} = await supabase.auth.getUser()
-      if (!user) return
-      const {data: p} = await supabase
-      .from('profiles')
-      .select('hearts, hearts_updated_at, is_admin')
-      .eq('id', user.id)
-      .single()
-
-      if (!p || p.is_admin) return
-      const h = currentHearts(p.hearts, p.hearts_updated_at)
-      if (h.hearts === 0) setOutOfHearts(h.nextInMs)
-    }
-  check()
-  },[])
+        setLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
-    if (!card) return
-    setAudioModeAsync({ playsInSilentMode: true }).catch(() => {})
+    const check = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("hearts, hearts_updated_at, is_admin")
+        .eq("id", user.id)
+        .single();
 
- 
-    const uri = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/audio/cards/${card.id}.mp3`
+      if (!p || p.is_admin) return;
+      const h = currentHearts(p.hearts, p.hearts_updated_at);
+      if (h.hearts === 0) setOutOfHearts(h.nextInMs);
+    };
+    check();
+  }, []);
+
+  useEffect(() => {
+    if (!card) return;
+    setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
+
+    const uri = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/audio/cards/${card.id}.mp3`;
 
     if (!playerRef.current) {
-      playerRef.current = createAudioPlayer(uri)
+      playerRef.current = createAudioPlayer(uri);
     } else {
-      playerRef.current.replace(uri)
+      playerRef.current.replace(uri);
     }
 
     return () => {
       if (playerRef.current) {
-        playerRef.current.remove()
-        playerRef.current = null
+        playerRef.current.remove();
+        playerRef.current = null;
       }
-    }
-  }, [card])
+    };
+  }, [card]);
 
   const speakWord = async () => {
-    if (!card?.has_audio) return
+    if (!card?.has_audio) return;
     try {
       if (playerRef.current) {
-        await playerRef.current.seekTo(0)
-        playerRef.current.play()
+        await playerRef.current.seekTo(0);
+        playerRef.current.play();
       }
     } catch (error) {
-      console.log('Speech error:', error)
+      console.log("Speech error:", error);
     }
-  }
+  };
   if (loading) {
-    return <SafeAreaView className="flex-1 bg-[#F1D4FF]" />
+    return <SafeAreaView className="flex-1 bg-[#F1D4FF]" />;
   }
-  if (outOfHearts !== null){
+  if (outOfHearts !== null) {
     return (
       <SafeAreaView className="flex-1 bg-[#F1D4FF] px-6 items-center justify-center">
-        <Image source={require('../assets/images/_-2-removebg-preview.png')} style={{ width: 72, height: 72, opacity: 0.35 }} resizeMode="contain" />
-        <Text className="font-pixel text-3xl text-[#543666] mt-4">Südamed otsas!</Text>
+        <Image
+          source={require("../assets/images/_-2-removebg-preview.png")}
+          style={{ width: 72, height: 72, opacity: 0.35 }}
+          resizeMode="contain"
+        />
+        <Text className="font-pixel text-3xl text-[#543666] mt-4">
+          Südamed otsas!
+        </Text>
         <Text className="font-inter text-base text-[#875BA1] text-center mt-2">
-          You're out of hearts. Next one in {Math.ceil(outOfHearts / 60000)} min.
+          You're out of hearts. Next one in {Math.ceil(outOfHearts / 60000)}{" "}
+          min.
         </Text>
         <Pressable
           onPress={() => router.back()}
           className="h-14 mt-8 px-8 rounded-2xl items-center justify-center bg-[#543666]"
         >
-          <Text className="text-lg font-semibold font-inter text-white">Back</Text>
+          <Text className="text-lg font-semibold font-inter text-white">
+            Back
+          </Text>
         </Pressable>
       </SafeAreaView>
-    )
+    );
   }
 
   if (notReady) {
@@ -139,11 +157,15 @@ export default function Lesson() {
         <Text className="text-center text-lg font-inter mt-10 text-[#543666]">
           Not yet ready. Please check the lesson and flashcard data.
         </Text>
-        <Pressable onPress={ () => router.back()} className="mt-4 px-4 py-2 bg-[#E2BFF6] border border-[#543666] rounded-full" style ={inputStyle}>
-          <Text className='font-pixel'>Tagasi</Text>
-          </Pressable>
+        <Pressable
+          onPress={() => router.back()}
+          className="mt-4 px-4 py-2 bg-[#E2BFF6] border border-[#543666] rounded-full"
+          style={inputStyle}
+        >
+          <Text className="font-pixel">Tagasi</Text>
+        </Pressable>
       </SafeAreaView>
-    )
+    );
   }
 
   return (
@@ -158,42 +180,44 @@ export default function Lesson() {
         </Pressable>
       </View>
 
-      <Text className='text-right font-inter text-lg'>
+      <Text className="text-right font-inter text-lg">
         {currentIndex + 1}/{flashcards.length}
       </Text>
 
-      <View className='w-full h-9 border border-[#543666] bg-[#CF8DF5] rounded-full overflow-hidden'>
+      <View className="w-full h-9 border border-[#543666] bg-[#CF8DF5] rounded-full overflow-hidden">
         <View
           style={{ width: `${(currentIndex / flashcards.length) * 100}%` }}
           className="h-9 bg-[#7F39A6]"
         />
       </View>
 
-      <Text className='text-center text-3xl font-bold font-inter pt-6 text-[#543666]'>
+      <Text className="text-center text-3xl font-bold font-inter pt-6 text-[#543666]">
         {`Lesson ${lesson.lesson_number}: ${lesson.name}`}
       </Text>
 
-      {mode === 'flashcard' ? (
+      {mode === "flashcard" ? (
         <FlashcardMode
           card={card}
           currentIndex={currentIndex}
           flashcards={flashcards}
           speakWord={speakWord}
           onPrevious={() => setCurrentIndex(currentIndex - 1)}
-          
           onNext={() => {
             if (currentIndex === flashcards.length - 1) {
-              const shuffled = [...flashcards].sort(() => Math.random() - 0.5);
-              setQuizOrder(shuffled)
-              setCurrentIndex(0)
-              setMode('quiz')
+              const shuffled = [...flashcards]
+              .sort(() => Math.random() - 0.5)
+              .map((c) => ({ ...c, quizType: pickQuizType(c) }));
+              setQuizOrder(shuffled);
+              setCurrentIndex(0);
+              setMode("quiz");
             } else {
-              setCurrentIndex(currentIndex + 1)
+              setCurrentIndex(currentIndex + 1);
             }
           }}
         />
       ) : (
         <QuizMultipleChoice
+          type={card.quizType}
           card={card}
           flashcards={quizorder}
           speakWord={speakWord}
@@ -201,18 +225,25 @@ export default function Lesson() {
             const finalMistakes = wasCorrect ? mistakes : mistakes + 1;
 
             if (!wasCorrect) {
-              setMistakes(finalMistakes)
-              const left = await loseHeart()
-              if (left === 0){
-                Alert.alert('Südamed on otsas!', 'You ran out of hearts! Come back in 30 minutes.', 
-                [{text: 'OK', onPress: () => router.replace('/(tabs)/dashboard' as any)}
-                ]) 
-                return
+              setMistakes(finalMistakes);
+              const left = await loseHeart();
+              if (left === 0) {
+                Alert.alert(
+                  "Südamed on otsas!",
+                  "You ran out of hearts! Come back in 30 minutes.",
+                  [
+                    {
+                      text: "OK",
+                      onPress: () => router.replace("/(tabs)/dashboard" as any),
+                    },
+                  ],
+                );
+                return;
               }
             }
             if (currentIndex === flashcards.length - 1) {
               router.push({
-                pathname: '/complete',
+                pathname: "/complete",
                 params: {
                   mistakes: String(finalMistakes),
                   total: String(flashcards.length),
@@ -220,9 +251,9 @@ export default function Lesson() {
                   moduleId: String(moduleId),
                   moduleName: lesson.name,
                 },
-              })
+              });
             } else {
-              setCurrentIndex(currentIndex + 1)
+              setCurrentIndex(currentIndex + 1);
             }
           }}
         />
