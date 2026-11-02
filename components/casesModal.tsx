@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
-import { Modal, Pressable, Text, View } from 'react-native';
+import { Modal, Pressable, Text, View, ScrollView } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 // All 14 cases in order, with the question word learners use to recognize them
 const CASES = [
-  { key: 'nimetav', q: 'mis?' },
-  { key: 'omastav', q: 'mille?' },
-  { key: 'osastav', q: 'mida?' },
-  { key: 'sisseütlev', q: 'millesse?' },
-  { key: 'seesütlev', q: 'milles?' },
-  { key: 'seestütlev', q: 'millest?' },
-  { key: 'alaleütlev', q: 'millele?' },
-  { key: 'alalütlev', q: 'millel?' },
-  { key: 'alaltütlev', q: 'millelt?' },
-  { key: 'saav', q: 'milleks?' },
-  { key: 'rajav', q: 'milleni?' },
-  { key: 'olev', q: 'millena?' },
-  { key: 'ilmaütlev', q: 'milleta?' },
-  { key: 'kaasaütlev', q: 'millega?' },
+  { key: 'nimetav',    q: 'kes/mis?',            qEn: 'who/what?',              en: 'the ___ (basic form)' },
+  { key: 'omastav',    q: 'kelle/mille?',        qEn: 'whose/of what?',         en: "the ___'s, of the ___" },
+  { key: 'osastav',    q: 'keda/mida?',          qEn: 'whom/what?',             en: 'two ___s, not the ___' },
+  { key: 'sisseütlev', q: 'kellesse/millesse?',  qEn: 'into whom/what?',        en: 'into the ___' },
+  { key: 'seesütlev',  q: 'kelles/milles?',      qEn: 'in whom/what?',          en: 'in the ___' },
+  { key: 'seestütlev', q: 'kellest/millest?',    qEn: 'out of whom/what?',      en: 'out of the ___' },
+  { key: 'alaleütlev', q: 'kellele/millele?',    qEn: 'to whom/onto what?',     en: 'onto the ___' },
+  { key: 'alalütlev',  q: 'kellel/millel?',      qEn: 'who has?/on what?',      en: 'on the ___' },
+  { key: 'alaltütlev', q: 'kellelt/millelt?',    qEn: 'from whom/off what?',    en: 'off the ___' },
+  { key: 'saav',       q: 'kelleks/milleks?',    qEn: '(turn) into whom/what?', en: 'becomes ___' },
+  { key: 'rajav',      q: 'kelleni/milleni?',    qEn: 'up to whom/what?',       en: 'up to the ___' },
+  { key: 'olev',       q: 'kellena/millena?',    qEn: 'as whom/what?',          en: 'as ___' },
+  { key: 'ilmaütlev',  q: 'kelleta/milleta?',    qEn: 'without whom/what?',     en: 'without ___' },
+  { key: 'kaasaütlev', q: 'kellega/millega?',    qEn: 'with whom/what?',        en: 'with ___' },
 ];
 
 export default function CasesModal({ card, visible, onClose }: any) {
@@ -35,10 +35,12 @@ export default function CasesModal({ card, visible, onClose }: any) {
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={close}>
-      {/* Backdrop: tapping the dark area closes */}
-      <Pressable className="flex-1 justify-end bg-black/40" onPress={close}>
-        {/* Sheet: a Pressable without onPress catches taps so they don't reach the backdrop */}
-        <Pressable className="bg-[#FBF5FF] rounded-t-3xl px-6 pt-3 pb-10">
+
+            <View className="flex-1 justify-end">
+        {/* Backdrop: its own layer behind the sheet, tapping it closes */}
+        <Pressable className="absolute inset-0 bg-black/40" onPress={close} />
+    
+        <View className="bg-[#FBF5FF] rounded-t-3xl px-6 pt-3 pb-10 max-h-[90%]">
           {/* Grab handle */}
           <View className="self-center w-10 h-1 rounded-full bg-[#E2BFF6] mb-4" />
 
@@ -57,20 +59,25 @@ export default function CasesModal({ card, visible, onClose }: any) {
             </Pressable>
           </View>
 
+          <ScrollView showsVerticalScrollIndicator={false}>
           {/* Grid: 3 columns, wraps into rows by itself */}
           <View className="flex-row flex-wrap -mx-1">
-            {shown.map(({ key, q }) => (
+            {shown.map(({ key, q, qEn, en }) => (
               <View key={key} className="w-1/3 p-1">
                 <View className="bg-white rounded-2xl p-3 border border-[#EBD5F7]">
-                  <Text className="text-xs font-medium font-inter text-[#875BA1] capitalize">{key}</Text>
-                  <Text className="text-[10px] font-inter text-[#B48FCB]">{q}</Text>
                   <Text
                     className="text-base font-bold font-inter text-[#543666] mt-1"
                     numberOfLines={1}
-                    adjustsFontSizeToFit
-                  >
+                    adjustsFontSizeToFit>
                     {card.cases[key]}
                   </Text>
+                  <Text className="text-xs font-inter text-[#543666] mt-1" numberOfLines={2}>
+                    {en.replaceAll('___', card.translation.toLowerCase())}
+                  </Text>
+                  <Text className="text-[10px] font-inter text-[#B48FCB] mt-1">
+                  {key} · {q} ({qEn})
+                  </Text>
+
                 </View>
               </View>
             ))}
@@ -86,8 +93,9 @@ export default function CasesModal({ card, visible, onClose }: any) {
             </Text>
             <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={14} color="#7F39A6" />
           </Pressable>
-        </Pressable>
-      </Pressable>
+          </ScrollView>
+      </View>
+      </View>
     </Modal>
   );
 }

@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase';
 
 export default function Complete() {
   const { mistakes, total, moduleId, lessonId, moduleName } = useLocalSearchParams();
-  const [coinsEarned, setCoinsEarned] = useState<number | null>(null)
+  const [KroonidEarned, setKroonidEarned] = useState<number | null>(null)
 
   const xp = Math.round((Number(total) - Number(mistakes)) / Number(total) * 25)
   const score = Math.round((Number(total) - Number(mistakes)) / Number(total) * 100)
@@ -38,18 +38,18 @@ export default function Complete() {
 
         const{ data: profile } = await supabase
         .from('profiles')
-        .select('xp, coins')
+        .select('xp, Kroonid')
         .eq('id', user.id)
         .single()
 
-        const coinsEarned = (existing ? 2 : 10) + (score === 100 ? 5 : 0)
-        setCoinsEarned(coinsEarned)
+        const KroonidEarned = (existing ? 2 : 10) + (score === 100 ? 5 : 0)
+        setKroonidEarned(KroonidEarned)
 
         const { error: xpError } = await supabase  
         .from('profiles')
         .update({ 
           xp: (profile?.xp ?? 0) + xp,
-          coins: (profile?.coins ?? 0) + coinsEarned })
+          Kroonid: (profile?.Kroonid ?? 0) + KroonidEarned })
         .eq ('id', user.id)
         if (xpError) console.log('xp save failed', xpError.message)
       
@@ -97,9 +97,9 @@ export default function Complete() {
             <Image source={require('../assets/images/moneystack.png')} style={{ width: 26, height: 26 }} resizeMode="contain" />
           </View>
           <Text className="text-4xl font-pixel text-[#543666]">
-            {coinsEarned === null ? '…' : `+${coinsEarned}`}
+            {KroonidEarned === null ? '…' : `+${KroonidEarned}`}
           </Text>
-          <Text className="text-sm font-medium font-inter text-[#875BA1]">Coins</Text>
+          <Text className="text-sm font-medium font-inter text-[#875BA1]">Kroonid</Text>
         </View>
       </View>
   
