@@ -40,3 +40,16 @@ export async function loseHeart(): Promise<number> {
 
   return newHearts
 }
+export async function getHearts(): Promise<number> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return MAX_HEARTS
+
+  const { data: p } = await supabase
+    .from('profiles')
+    .select('hearts, hearts_updated_at, is_admin')
+    .eq('id', user.id)
+    .single()
+  if (!p || p.is_admin) return MAX_HEARTS
+
+  return currentHearts(p.hearts, p.hearts_updated_at).hearts
+}

@@ -6,11 +6,21 @@ import Foundation from '@expo/vector-icons/Foundation';
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from '../lib/supabase'
 import { images } from '../lib/images'
+import HeartsBar from '../components/heartsBar';
+import { getHearts, MAX_HEARTS } from '../lib/hearts';
+
 
 export default function Module() {
   const { id, name } = useLocalSearchParams(); 
   const [lessons, setLessons] = useState<any[]>([])
   const [completedCount, setCompletedCount] = useState(0)
+
+  const [hearts, setHearts] = useState(MAX_HEARTS);
+
+
+useFocusEffect(useCallback(() => {
+  getHearts().then(setHearts);
+}, []));
 
 const inputStyle = {
   shadowColor: '#7F39A6',
@@ -30,13 +40,21 @@ useEffect(() => {
 
 useFocusEffect(
   useCallback(() => {
-    supabase
-      .from('progress')
-      .select('lesson_number')
-      .eq('module_id', Number(id))
-      .then(({ data }) => setCompletedCount(data?.length ?? 0))
+    const load = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('progress')
+        .select('lesson_number')
+        .eq('user_id', user.id)
+        .eq('module_id', Number(id));
+
+      setCompletedCount(data?.length ?? 0);
+    };
+    load();
   }, [id])
-)
+);
  
 
 return (
@@ -45,11 +63,7 @@ return (
         <Pressable onPress={ () => router.push('/dashboard')} className="flex-row items-center  rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2 mr-2 " style={{ ...inputStyle }}>
         <Ionicons name="caret-back" size={24} color="#7F39A6" /></Pressable>
 
-      <View className="flex-row mt-3 items-center justify-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2" style={{ width: 110, ...inputStyle }}>
-    <Image source={require('../assets/images/_-2-removebg-preview.png')} style={{ width: 28, height: 28 }} resizeMode="contain"/>
-    <Image source={require('../assets/images/_-2-removebg-preview.png')} style={{ width: 28, height: 28 }} resizeMode="contain"/>
-    <Image source={require('../assets/images/_-2-removebg-preview.png')} style={{ width: 28, height: 28 }} resizeMode="contain"/>
-  </View>
+                <HeartsBar hearts={hearts} />
 
   </View>
   <View className=' w-full items-center' >
@@ -59,7 +73,7 @@ return (
         <Text className='text-center font- mt-3 text-xl'>Completed</Text>
       </View>
       <View className='w-full h-5 border border-[#543666] bg-[#CF8DF5] rounded-full mt-2 overflow-hidden'>
-    <View style={{width: `${(completedCount / lessons.length || 1)*100}%`}} className="h-5 bg-[#7F39A6]"> 
+    <View style={{width: `${(completedCount / (lessons.length || 1)) * 100}%`}} className="h-5 bg-[#7F39A6]"> 
     </View>
   </View>
   <FlatList

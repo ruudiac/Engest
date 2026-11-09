@@ -1,4 +1,4 @@
-import { currentHearts, loseHeart } from "@/lib/hearts";
+import { currentHearts, loseHeart, MAX_HEARTS } from "@/lib/hearts";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
 import { router, useLocalSearchParams } from "expo-router";
@@ -9,6 +9,7 @@ import FlashcardMode from "../components/flashCardMode";
 import QuizMultipleChoice from "../components/quizMultipleChoice";
 import { images } from "../lib/images";
 import { supabase } from "../lib/supabase";
+import HeartsBar from "../components/heartsBar";
 
 // Picks a random quiz type that this card can actually support
 const pickQuizType = (c: any, prev: string) => {
@@ -24,6 +25,7 @@ export default function Lesson() {
   const [lesson, setLesson] = useState<any>(null);
   const [flashcards, setFlashcards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hearts, setHearts] = useState(MAX_HEARTS);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mode, setMode] = useState("flashcard");
@@ -87,6 +89,7 @@ export default function Lesson() {
 
       if (!p || p.is_admin) return;
       const h = currentHearts(p.hearts, p.hearts_updated_at);
+      setHearts(h.hearts);
       if (h.hearts === 0) setOutOfHearts(h.nextInMs);
     };
     check();
@@ -180,6 +183,7 @@ export default function Lesson() {
         >
           <Ionicons name="caret-back" size={24} color="#7F39A6" />
         </Pressable>
+        {mode === "quiz" && <HeartsBar hearts={hearts} />}
       </View>
 
       <Text className="text-right font-inter text-lg">
@@ -245,6 +249,7 @@ export default function Lesson() {
             if (firstMistake) {
               setMistakes(finalMistakes);
               const left = await loseHeart();
+              setHearts(left);
               if (left === 0) {
                 Alert.alert(
                   "Südamed otsas!",
