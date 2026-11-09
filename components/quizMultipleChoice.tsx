@@ -20,6 +20,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
   }, [card, type])
 
   const isCorrect = selectedAnswer === answer
+  const showReveal = selectedAnswer !== null && !isCorrect
 
   const cardStyle = {
     shadowColor: '#9B59B6',
@@ -46,25 +47,44 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
 
   return (
     <View className='flex-1'>
-      {/* Word card */}
 
       <View className='bg-[#E2BFF6] rounded-3xl mt-6 items-center justify-center mb-7 px-6' style={{ height: 300, ...cardStyle }}>
-        {type === 'et-en' && (
-        <Text allowFontScaling={false} className="font-bold text-[#543666] font-inter text-center" style={wordStyle(card.word)}>{card.word}</Text>
-          )}
-        {type === 'en-et' && (
-        <Text allowFontScaling={false} className="font-bold text-[#543666] font-inter text-center" style={wordStyle(card.translation)}>{card.translation}</Text>
-          )}
-        {type === 'picture' && (
-        <Image source={card.image} style={{ width: 220, height: 220 }} resizeMode="contain" />
-      )}
-      
-      {(type === 'et-en' || type === 'listen') && card.has_audio && (
-      <Pressable onPress={speakWord} className={`${type === 'listen' ? 'w-24 h-24' : 'mt-4 w-12 h-12'} rounded-full bg-[#F6E9FF] items-center justify-center`}>
-      <Ionicons name="volume-high" size={type === 'listen' ? 48 : 24} color="#7F39A6" />
-      </Pressable>
-      )}
+        {showReveal ? (
+          <>
+    
+            <Text className="font-inter text-s text-[#875BA1] mb-2 ">Vaatame korra veel</Text>
+            {card.image && (
+              <Image source={card.image} style={{ width: 100, height: 100 }} resizeMode="contain" />
+            )}
+            <Text allowFontScaling={false} numberOfLines={1} adjustsFontSizeToFit className="font-bold text-[#543666] font-inter text-center" style={wordStyle(card.word)}>
+              {card.word}
+            </Text>
+            <Text className="font-inter text-xl text-[#875BA1] mt-1">{card.translation}</Text>
+            {card.has_audio && (
+              <Pressable onPress={speakWord} className="absolute top-4 left-4 mt-3 w-12 h-12 mb-2 rounded-full bg-[#F6E9FF] items-center justify-center border-2 border-[#8934ba]">
+                <Ionicons name="volume-high" size={24} color="#7F39A6" />
+              </Pressable>
+            )}
+          </>
+        ) : (
+          <>
 
+            {type === 'et-en' && (
+              <Text allowFontScaling={false} className="font-bold text-[#543666] font-inter text-center" style={wordStyle(card.word)}>{card.word}</Text>
+            )}
+            {type === 'en-et' && (
+              <Text allowFontScaling={false} className="font-bold text-[#543666] font-inter text-center" style={wordStyle(card.translation)}>{card.translation}</Text>
+            )}
+            {type === 'picture' && (
+              <Image source={card.image} style={{ width: 220, height: 220 }} resizeMode="contain" />
+            )}
+            {(type === 'et-en' || type === 'listen') && card.has_audio && (
+              <Pressable onPress={speakWord} className={`${type === 'listen' ? 'w-24 h-24' : 'mt-4 w-12 h-12'} rounded-full bg-[#F6E9FF] items-center justify-center`}>
+                <Ionicons name="volume-high" size={type === 'listen' ? 48 : 24} color="#7F39A6" />
+              </Pressable>
+            )}
+          </>
+        )}
       </View>
 
       {/* Answer options */}
@@ -74,7 +94,10 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
           return (
             <Pressable
               key={option}
-              onPress={() => setSelectedAnswer(option)}
+                onPress={() => {
+                setSelectedAnswer(option)
+                if (option !== answer && card.has_audio) speakWord()
+              }}
               disabled={selectedAnswer !== null}
               className={`h-16 rounded-2xl border-2 px-5 flex-row items-center justify-center ${styles[state].box}`}
             >
