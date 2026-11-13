@@ -4,22 +4,26 @@ import { View } from "react-native";
 import { supabase } from "@/lib/supabase";
 
 export default function Index() {
-  const [checked, setChecked] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [target, setTarget] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data, error }) => {
-      console.log('session check', !!data?.session, error?.message);
-      setLoggedIn(!!data?.session);
-    })
-    .catch((e) => {
-      console.log('session check fail', e)
-      setLoggedIn(false)
-    })
-    .finally(() => setChecked(true)) 
-  },[])
+    const check = async () => {
+      // 1. Logged in?
+      const { data } = await supabase.auth.getSession();
+      if (!data?.session) return setTarget('/login_signup');
 
-  if (!checked)
-  return <View style={{ flex: 1, backgroundColor: '#EAD4F6' }} />;
-  return <Redirect href={(loggedIn ? '/(tabs)/dashboard': '/login_signup') as any} />;
+      // 2. Onboarding done?
+      const { data: p } = await supabase
+        .from('profiles')
+        .select('onboarded')
+        .eq('id', data.session.user.id)
+        .single();
+
+      setTarget(p?.onboarded ? '/(tabs)/dashboard' : '/onboarding');
+    };
+    check().catch(() => setTarget('/login_signup'));
+  }, []);
+
+  if (!target) return <View style={{ flex: 1, backgroundColor: '#EAD4F6' }} />;
+  return <Redirect href={target as any} />;
 }

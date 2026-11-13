@@ -73,7 +73,7 @@ export default function AuthScreen() {
       return;
     }
 
-    router.replace('/(tabs)/dashboard' as any);
+        router.replace('/' as any);
   };
   const handleGoogle = () => {
     console.log("Google sign in pressed");

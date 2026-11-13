@@ -3,6 +3,7 @@ import { Pressable, Text, View, Image } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import CasesModal from './casesModal';
 import { wordStyle, translationStyle, soundStyle } from './wordSize';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 export default function FlashcardMode({ card, currentIndex, flashcards, speakWord, onNext, onPrevious }:  any) {
 
@@ -30,10 +31,15 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
     <View className='bg-[#E2BFF6] rounded-3xl m-8 p-6 pb-10 flex-1 justify-center' style={cardStyle}>
     
     {card.has_audio && (
-    <Pressable onPress={speakWord} className="absolute top-6 left-6 w-12 h-12 rounded-full bg-[#F6E9FF] items-center justify-center z-10">
+    <Pressable onPress={() => speakWord()} className="absolute top-6 left-6 w-12 h-12 rounded-full bg-[#F6E9FF] items-center justify-center z-10">
       <Ionicons name="volume-high" size={24} color="#7F39A6" />
     </Pressable>
     )}
+    {card.has_audio && (
+  <Pressable onPress={() => speakWord(true)} className="absolute top-20 left-6 w-12 h-12 rounded-full bg-[#F6E9FF] items-center justify-center z-10">
+    <MaterialCommunityIcons name="snail" size={24} color="#7F39A6" />
+  </Pressable>
+)}
 
     {card.sound && (
   <View className="self-center mt-0 mx-14 rounded-3xl bg-[#F6E9FF] border-2 border-[#CF8DF5] items-center justify-center"

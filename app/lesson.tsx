@@ -118,12 +118,14 @@ export default function Lesson() {
     };
   }, [card]);
 
-  const speakWord = async () => {
+  const speakWord = async (slow?: boolean) => {
     if (!card?.has_audio) return;
     try {
-      if (playerRef.current) {
-        await playerRef.current.seekTo(0);
-        playerRef.current.play();
+      const player = playerRef.current;
+      if (player) {
+        player.setPlaybackRate(slow === true ? 0.7 : 1, 'high');
+        await player.seekTo(0);
+        player.play();
       }
     } catch (error) {
       console.log("Speech error:", error);
