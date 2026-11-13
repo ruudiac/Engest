@@ -1,7 +1,7 @@
-import { View, Text, Pressable, Image, FlatList} from 'react-native';
+import { View, Text, Pressable, Image, FlatList, Dimensions} from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import React, { useState, useCallback, useEffect} from "react";
+import React, { useState, useCallback, useEffect, useRef} from "react";
 import { supabase } from '../../lib/supabase'
 import { images } from '../../lib/images'
 import PixelProgress from '../../components/pixelProgress'
@@ -10,6 +10,8 @@ import Bobbing from '../../components/bobbing'
 import StreetStrip from '../../components/street'
 import { currentHearts, MAX_HEARTS } from '@/lib/hearts';
 import HelpButton from '../../components/helpButton';
+import Tour from '../../components/tour';
+
 
 
 
@@ -54,8 +56,6 @@ const inputStyle = {
 }
 
 
-
-
 export default function Dashboard() {
   const [totalXP, setTotalXP] = useState(0)
   const [modules, setModules] = useState<any[]>([])
@@ -65,6 +65,43 @@ export default function Dashboard() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [ coins, setCoins] = useState(0);
   const [hearts, setHearts] = useState(MAX_HEARTS);
+  const statsRef = useRef<React.ComponentRef<typeof View>>(null);
+  const continueRef = useRef<React.ComponentRef<typeof View>>(null);
+  const modulesRef = useRef<React.ComponentRef<typeof View>>(null);
+  const [tourSteps, setTourSteps] = useState<any[] | null>(null);
+  const screenRef = useRef<React.ComponentRef<typeof View>>(null);
+
+  const measure = (ref: any) =>
+    new Promise<any>((resolve) => {
+      if (!ref.current) return resolve(null);
+      ref.current.measureInWindow((x: number, y: number, width: number, height: number) =>
+        resolve({ x, y, width, height }),
+      );
+    });
+
+    const startTour = async () => {
+    const [stats, cont, mods, screen] = await Promise.all([
+      measure(statsRef), measure(continueRef), measure(modulesRef), measure(screenRef),
+    ]);
+
+    // The tab bar starts where the dashboard ends, and goes to the bottom of the phone
+    const H = Dimensions.get('window').height;
+    const tabTop = screen ? screen.y + screen.height : H - 90;
+    const menuRect = { x: 0, y: tabTop, width: Dimensions.get('window').width, height: H - tabTop };
+
+    setTourSteps([
+      { rect: stats, titleEt: 'Sinu edenemine', titleEn: 'Your progress', text: 'Your level, hearts and kroons. Tap any "?" to learn more.' },
+      { rect: cont, titleEt: 'Jätka õppimist', titleEn: 'Continue learning', text: 'Your next lesson is always here. One tap and you are learning.' },
+      { rect: mods, titleEt: 'Õppemoodulid', titleEn: 'Learning modules', text: 'All the topics. Finish one module to unlock the next.' },
+      { rect: menuRect, titleEt: 'Menüü', titleEn: 'Menu', text: 'Down here: the leaderboard, the shop and your own room.' },
+    ]);
+  };
+
+  const finishTour = async () => {
+    setTourSteps(null);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) await supabase.from('profiles').update({ toured: true }).eq('id', user.id);
+  };
 
   useEffect(() => {
     supabase
@@ -95,7 +132,7 @@ export default function Dashboard() {
         if (user) {
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .select('xp, is_admin, coins, hearts, hearts_updated_at')
+            .select('xp, is_admin, coins, hearts, hearts_updated_at, toured')
             .eq('id', user.id)
             .single()
 
@@ -105,6 +142,7 @@ export default function Dashboard() {
             setCoins(profile?.coins ?? 0)
             
             if (profile) {
+              if (!profile.toured) setTimeout(startTour, 800);
               setHearts(profile.is_admin ? MAX_HEARTS : currentHearts(profile.hearts, profile.hearts_updated_at).hearts)
             }
         }
@@ -129,7 +167,7 @@ const isUnlocked = (index: number) => {
 }
 
   return (
-    <SafeAreaView edges={['top']} className="flex-1 bg-[#EAD4F6] items-center px-6">
+    <SafeAreaView ref={screenRef} collapsable={false} edges={['top']} className="flex-1 bg-[#EAD4F6] items-center px-6">
       <View
     pointerEvents="none"
     style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}
@@ -141,7 +179,7 @@ const isUnlocked = (index: number) => {
     </View>
     
     
-    <View className="flex-row items-center justify-between w-full mt-2 mb-2">
+    <View ref={statsRef} collapsable={false} className="flex-row items-center justify-between w-full mt-2 mb-2">
       <View>
         <Pressable onPress={level} className="flex-row items-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2" style={{ width: 130, ...inputStyle }}>
     <View className="rounded-full bg-[#F3DEFF] border border-[#543666] overflow-hidden mr-2">
@@ -191,7 +229,9 @@ const isUnlocked = (index: number) => {
 
 {/* Continue card */}
 {next ? (
-  <View
+    <View
+    ref={continueRef}
+    collapsable={false}
     className="w-full bg-[#543666] rounded-3xl p-4 mt-4 flex-row items-center"
     style={inputStyle}
   >
@@ -238,7 +278,7 @@ const isUnlocked = (index: number) => {
   </View>
 )}
 
-<View className='w-full'>
+<View ref={modulesRef} collapsable={false} className='w-full'>
     <Text className="font-pixel text-black text-3xl mr-5 mt-4 w-full text-left">
         Learning modules
       </Text>
@@ -282,7 +322,7 @@ const isUnlocked = (index: number) => {
       </Pressable>
     )
     }}/>
-
+        {tourSteps && <Tour steps={tourSteps} onDone={finishTour} />}
     </SafeAreaView>
   );
 }
