@@ -10,10 +10,12 @@ import QuizMultipleChoice from "../components/quizMultipleChoice";
 import { images } from "../lib/images";
 import { supabase } from "../lib/supabase";
 import HeartsBar from "../components/heartsBar";
+import MatchPairs from "../components/matchPairs";
 
 // Picks a random quiz type that this card can actually support
 const pickQuizType = (c: any, prev: string) => {
   const types = ['et-en', 'en-et']
+  if (c.cases) types.push('case')
   if (c.has_audio) types.push('listen')
   if (c.image) types.push('picture')
   const options = types.filter((t) => t !== prev)
@@ -126,6 +128,50 @@ export default function Lesson() {
       console.log("Speech error:", error);
     }
   };
+
+  const onQuizNext = async (wasCorrect: boolean) => {
+            // a card counts as a mistake, costs a heart, only first time it is anwered wrong
+            const firstMistake = !wasCorrect && !card.retry;
+            const finalMistakes = firstMistake ? mistakes + 1 : mistakes;
+
+            //anytime a card is answered wrong, goes back to the quiz queue, in a new quiz type
+            let order = quizorder;
+
+            if (!wasCorrect) {
+              const last = quizorder[quizorder.length - 1];
+              order = [...quizorder, { ...card, retry: true, quizType: pickQuizType(card, last.quizType) }];
+              setQuizOrder(order);
+            }
+
+            if (firstMistake) {
+              setMistakes(finalMistakes);
+              const left = await loseHeart();
+              setHearts(left);
+              if (left === 0) {
+                Alert.alert(
+                  "Südamed otsas!",
+                  "You're out of hearts. Come back in 30 minutes.",
+                  [{ text: "OK", onPress: () => router.replace("/(tabs)/dashboard" as any) }],
+                );
+                return;
+              }
+            }
+
+            if (currentIndex === order.length - 1) {
+              router.push({
+                pathname: "/complete",
+                params: {
+                  mistakes: String(finalMistakes),
+                  total: String(flashcards.length),
+                  lessonId: String(lesson.lesson_number),
+                  moduleId: String(moduleId),
+                  moduleName: lesson.name,
+                },
+              });
+            } else {
+              setCurrentIndex(currentIndex + 1);
+            }
+          }
   if (loading) {
     return <SafeAreaView className="flex-1 bg-[#F1D4FF]" />;
   }
@@ -197,8 +243,11 @@ export default function Lesson() {
         />
       </View>
 
-      <Text className="text-center text-3xl font-bold font-inter pt-6 text-[#543666]">
-        {`Lesson ${lesson.lesson_number}: ${lesson.name}`}
+            <Text className="text-center text-3xl font-bold font-inter pt-4 text-[#543666]">
+        {lesson.name}
+      </Text>
+      <Text className="text-center font-inter text-base text-[#875BA1]">
+        {`${lesson.lesson_number}. tund · ${lesson.subtitle}`}
       </Text>
 
       {mode === "flashcard" ? (
@@ -218,6 +267,7 @@ export default function Lesson() {
                   prev = quizType
                   return { ...c, quizType }
                 });
+                if (flashcards.length >= 3) shuffled.push({ id: 'match', quizType: 'match' });
               setQuizOrder(shuffled);
               setCurrentIndex(0);
               setMode("quiz");
@@ -226,55 +276,15 @@ export default function Lesson() {
             }
           }}
         />
+            ) : card.quizType === "match" ? (
+        <MatchPairs words={flashcards} onNext={onQuizNext} />
       ) : (
         <QuizMultipleChoice
           type={card.quizType}
           card={card}
           flashcards={quizorder}
           speakWord={speakWord}
-          onNext={async (wasCorrect: boolean) => {
-            // a card counts as a mistake, costs a heart, only first time it is anwered wrong
-            const firstMistake = !wasCorrect && !card.retry;
-            const finalMistakes = firstMistake ? mistakes + 1 : mistakes;
-
-            //anytime a card is answered wrong, goes back to the quiz queue, in a new quiz type
-            let order = quizorder;
-
-            if (!wasCorrect) {
-              const last = quizorder[quizorder.length - 1];
-              order = [...quizorder, { ...card, retry: true, quizType: pickQuizType(card, last.quizType) }];
-              setQuizOrder(order);
-            }
-
-            if (firstMistake) {
-              setMistakes(finalMistakes);
-              const left = await loseHeart();
-              setHearts(left);
-              if (left === 0) {
-                Alert.alert(
-                  "Südamed otsas!",
-                  "You're out of hearts. Come back in 30 minutes.",
-                  [{ text: "OK", onPress: () => router.replace("/(tabs)/dashboard" as any) }],
-                );
-                return;
-              }
-            }
-
-            if (currentIndex === order.length - 1) {
-              router.push({
-                pathname: "/complete",
-                params: {
-                  mistakes: String(finalMistakes),
-                  total: String(flashcards.length),
-                  lessonId: String(lesson.lesson_number),
-                  moduleId: String(moduleId),
-                  moduleName: lesson.name,
-                },
-              });
-            } else {
-              setCurrentIndex(currentIndex + 1);
-            }
-          }}
+          onNext={onQuizNext}
         />
       )}
     </SafeAreaView>

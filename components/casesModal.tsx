@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Modal, Pressable, Text, View, ScrollView } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
+
 // All 14 cases in order, with the question word learners use to recognize them
-const CASES = [
+export const CASES = [
   { key: 'nimetav',    q: 'kes/mis?',            qEn: 'who/what?',              en: 'the ___ (basic form)' },
   { key: 'omastav',    q: 'kelle/mille?',        qEn: 'whose/of what?',         en: "the ___'s, of the ___" },
   { key: 'osastav',    q: 'keda/mida?',          qEn: 'whom/what?',             en: 'two ___s, not the ___' },

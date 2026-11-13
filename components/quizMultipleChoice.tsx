@@ -2,16 +2,30 @@ import React, { useState, useMemo } from "react";
 import { Pressable, Text, View, Image } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { wordStyle, translationStyle, soundStyle } from './wordSize';
+import { CASES } from './casesModal';
+
+
+const QUIZ_CASES = ['sisseütlev', 'seesütlev', 'seestütlev', 'alaleütlev', 'alalütlev', 'alaltütlev', 'ilmaütlev', 'kaasaütlev'];
 
 export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord, type = 'et-en' }: any) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
 
   const answerKey = type === 'et-en' ? 'translation' : 'word'
-  const answer = card[answerKey]
+  const caseInfo = useMemo(() => {
+    if (type !== 'case') return null
+    const usable = CASES.filter((c) => QUIZ_CASES.includes(c.key) && card.cases?.[c.key])
+    return usable[Math.floor(Math.random() * usable.length)]
+  }, [card, type])
+
+  const answer = type === 'case' ? card.cases[caseInfo!.key] : card[answerKey]
 
   const options = useMemo(() => {
 
-    const others = [...new Set(flashcards.map((f: any) => f[answerKey]))]
+    const pool = type === 'case'
+      ? Object.values(card.cases)
+      : flashcards.map((f: any) => f[answerKey])
+
+    const others = [...new Set(pool)]
       .filter((v) => v !== answer)
       .sort(() => Math.random() - 0.5)
       .slice(0, 2)
@@ -61,7 +75,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
             </Text>
             <Text className="font-inter text-xl text-[#875BA1] mt-1">{card.translation}</Text>
             {card.has_audio && (
-              <Pressable onPress={speakWord} className="absolute top-4 left-4 mt-3 w-12 h-12 mb-2 rounded-full bg-[#F6E9FF] items-center justify-center border-2 border-[#8934ba]">
+              <Pressable onPress={speakWord} className="absolute top-4 left-4 mt-3 w-12 h-12 mb-2 rounded-full bg-[#F6E9FF] items-center justify-center">
                 <Ionicons name="volume-high" size={24} color="#7F39A6" />
               </Pressable>
             )}
@@ -82,6 +96,17 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
               <Pressable onPress={speakWord} className={`${type === 'listen' ? 'w-24 h-24' : 'mt-4 w-12 h-12'} rounded-full bg-[#F6E9FF] items-center justify-center`}>
                 <Ionicons name="volume-high" size={type === 'listen' ? 48 : 24} color="#7F39A6" />
               </Pressable>
+            )}
+                        {type === 'case' && (
+              <>
+                <Text className="font-inter text-lg text-[#875BA1]">{card.word}</Text>
+                <Text className="font-bold text-3xl text-[#543666] font-inter text-center mt-2">
+                  {caseInfo!.en.replaceAll('___', card.translation.toLowerCase())}
+                </Text>
+                <Text className="font-inter text-sm text-[#B48FCB] mt-2">
+                  {caseInfo!.key} · {caseInfo!.q}
+                </Text>
+              </>
             )}
           </>
         )}

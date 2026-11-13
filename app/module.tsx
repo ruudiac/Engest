@@ -14,6 +14,16 @@ export default function Module() {
   const { id, name } = useLocalSearchParams(); 
   const [lessons, setLessons] = useState<any[]>([])
   const [completedCount, setCompletedCount] = useState(0)
+  const [mod, setMod] = useState<any>(null);
+
+  useEffect(() => {
+    supabase
+      .from('modules')
+      .select('name, subtitle')
+      .eq('id', Number(id))
+      .single()
+      .then(({ data }) => setMod(data));
+  }, [id]);
 
   const [hearts, setHearts] = useState(MAX_HEARTS);
 
@@ -67,14 +77,14 @@ return (
 
   </View>
   <View className=' w-full items-center' >
-        <Text className="font-pixel text-black text-2xl mr-5 mt-4 w-full text-center">{`Module ${id}: ${name}`}</Text> 
+          <Text className="font-pixel text-black text-2xl mt-4 w-full text-center">{mod?.subtitle}</Text>
+        <Text className="font-inter text-[#875BA1] text-base w-full text-center">{`${id}. moodul · ${mod?.name ?? ''}`}</Text>
       </View>
       <View className='w-full'>
         <Text className='text-center font- mt-3 text-xl'>Completed</Text>
       </View>
       <View className='w-full h-5 border border-[#543666] bg-[#CF8DF5] rounded-full mt-2 overflow-hidden'>
-    <View style={{width: `${(completedCount / (lessons.length || 1)) * 100}%`}} className="h-5 bg-[#7F39A6]"> 
-    </View>
+      <Text className='text-center font-inter mt-3 text-xl'>{`${completedCount}/${lessons.length} läbitud`}</Text>
   </View>
   <FlatList
   className='w-full mt-4'

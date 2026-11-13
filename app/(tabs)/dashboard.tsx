@@ -172,7 +172,7 @@ const isUnlocked = (index: number) => {
     <View className="flex-1 pr-2">
       <Text className="font-pixel text-[#F3DEFF] text-lg">Jätka õppimist</Text>
       <Text className="font-inter text-[#CF8DF5] text-xs mt-1" numberOfLines={1}>
-        {next.module.name} · Lesson {next.lesson.lesson_number} of {next.total}
+          {next.module.subtitle} · Tund {next.lesson.lesson_number}/{next.total}
       </Text>
       <Text className="font-inter font-bold text-white text-base mt-1" numberOfLines={1}>
         {next.lesson.name}
