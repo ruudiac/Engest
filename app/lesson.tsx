@@ -11,6 +11,7 @@ import { images } from "../lib/images";
 import { supabase } from "../lib/supabase";
 import HeartsBar from "../components/heartsBar";
 import MatchPairs from "../components/matchPairs";
+import LoadingScreen from "../components/loadingScreen";
 
 // Picks a random quiz type that this card can actually support
 const pickQuizType = (c: any, prev: string) => {
@@ -60,9 +61,10 @@ export default function Lesson() {
   const total = mode === "quiz" ? quizorder.length : flashcards.length;
 
   useEffect(() => {
-    supabase
-      .from("lessons")
-      .select("*, cards(*)")
+    setTimeout(() => {   // TEST ONLY: remove after
+      supabase
+        .from("lessons")
+              .select("*, cards(*)")
       .eq("module_id", Number(moduleId))
       .eq("lesson_number", Number(lessonId))
       .order("position", { referencedTable: "cards" })
@@ -75,7 +77,8 @@ export default function Lesson() {
           );
         }
         setLoading(false);
-      });
+        });
+    }, 3000);
   }, []);
 
   useEffect(() => {
@@ -193,7 +196,7 @@ export default function Lesson() {
             }
           }
   if (loading) {
-    return <SafeAreaView className="flex-1 bg-[#F1D4FF]" />;
+    return <LoadingScreen />;
   }
   if (outOfHearts !== null) {
     return (
@@ -240,7 +243,7 @@ export default function Lesson() {
     );
   }
   if (!card) {
-    return <SafeAreaView className="flex-1 bg-[#F1D4FF]" />;
+    return <LoadingScreen />;
   }
 
   return (

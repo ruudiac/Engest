@@ -1,13 +1,17 @@
 import { Redirect } from "expo-router";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
 import { supabase } from "@/lib/supabase";
+import LoadingScreen from '../components/loadingScreen';
+
+
 
 export default function Index() {
   const [target, setTarget] = useState<string | null>(null);
 
+
   useEffect(() => {
     const check = async () => {
+       await new Promise((r) => setTimeout(r, 3000));
       // 1. Logged in?
       const { data } = await supabase.auth.getSession();
       if (!data?.session) return setTarget('/login_signup');
@@ -24,6 +28,6 @@ export default function Index() {
     check().catch(() => setTarget('/login_signup'));
   }, []);
 
-  if (!target) return <View style={{ flex: 1, backgroundColor: '#EAD4F6' }} />;
+  if (!target) return <LoadingScreen />;
   return <Redirect href={target as any} />;
 }
