@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Image, FlatList, Dimensions} from 'react-native';
+import { View, Text, Pressable, Image, FlatList, Dimensions, LayoutAnimation} from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useState, useCallback, useEffect, useRef} from "react";
@@ -11,6 +11,7 @@ import StreetStrip from '../../components/street'
 import { currentHearts, MAX_HEARTS } from '@/lib/hearts';
 import HelpButton from '../../components/helpButton';
 import Tour from '../../components/tour';
+
 
 
 
@@ -70,6 +71,18 @@ export default function Dashboard() {
   const modulesRef = useRef<React.ComponentRef<typeof View>>(null);
   const [tourSteps, setTourSteps] = useState<any[] | null>(null);
   const screenRef = useRef<React.ComponentRef<typeof View>>(null);
+  const [cardOpen, setCardOpen] = useState(true);
+
+  const toggleCard = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut); // animate the next layout change
+    setCardOpen(!cardOpen);
+  };
+
+  const openLesson = () =>
+  router.push({
+    pathname: '/lesson',
+    params: { moduleId: next.module.id, lessonId: next.lesson.lesson_number },
+  })
 
   const measure = (ref: any) =>
     new Promise<any>((resolve) => {
@@ -181,7 +194,7 @@ const isUnlocked = (index: number) => {
     
     <View ref={statsRef} collapsable={false} className="flex-row items-center justify-between w-full mt-2 mb-2">
       <View>
-        <Pressable onPress={level} className="flex-row items-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2" style={{ width: 130, ...inputStyle }}>
+        <Pressable onPress={() => router.push('/stats' as any)} className="flex-row items-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2" style={{ width: 130, ...inputStyle }}>
     <View className="rounded-full bg-[#F3DEFF] border border-[#543666] overflow-hidden mr-2">
       <Image source={require('../../assets/images/star-removebg-preview.png')} style={{ width: 24, height: 24 }} resizeMode="contain"/>
     </View>
@@ -229,47 +242,68 @@ const isUnlocked = (index: number) => {
 
 {/* Continue card */}
 {next ? (
-    <View
+  <View
     ref={continueRef}
     collapsable={false}
     className="w-full bg-[#543666] rounded-3xl p-4 mt-4 flex-row items-center"
     style={inputStyle}
   >
-        <View className="flex-1 pr-2">
-          <View className='flex-row items-center gap-2'>
-        <Text className="font-pixel text-[#F3DEFF] text-lg">Jätka õppimist</Text>
+    <View className="flex-1 pr-2">
+      {/* Title row: tap to fold or unfold */}
+      <View className="flex-row items-center gap-2">
+        <Pressable onPress={toggleCard} hitSlop={8} className="flex-row items-center gap-2">
+          <Text className="font-pixel text-[#F3DEFF] text-lg">Jätka õppimist</Text>
+          <Ionicons name={cardOpen ? 'chevron-up' : 'chevron-down'} size={16} color="#F3DEFF" />
+        </Pressable>
         <HelpButton
           titleEt="Jätka õppimist"
           titleEn="Continue learning"
-          text="This card always shows your next lesson. Tap 'Jätka' to pick up where you left off."/>
+          text="This card always shows your next lesson. Tap 'Jätka' to pick up where you left off. Tap the title to fold the card."/>
       </View>
-      <Text className="font-inter text-[#CF8DF5] text-xs mt-1" numberOfLines={1}>
-          {next.module.subtitle} · Tund {next.lesson.lesson_number}/{next.total}
-      </Text>
-      <Text className="font-inter font-bold text-white text-base mt-1" numberOfLines={1}>
-        {next.lesson.name}
-      </Text>
-      <View className="mt-3">
-        <PixelProgress total={next.total} done={completedCounts[next.module.id] ?? 0} />
-      </View>
-      <Pressable
-        onPress={() => router.push({
-          pathname: '/lesson',
-          params: { moduleId: next.module.id, lessonId: next.lesson.lesson_number },
-        })}
-        className="mt-3 self-start flex-row items-center gap-2 bg-[#F3DEFF] rounded-xl px-4 py-2"
-      >
-        <Text className="font-pixel text-[#543666] text-base">Jätka</Text>
-        <Ionicons name="play" size={14} color="#543666" />
-      </Pressable>
+
+      {cardOpen ? (
+        <>
+          {/* Open: the full card */}
+          <Text className="font-inter text-[#CF8DF5] text-xs mt-1" numberOfLines={1}>
+            {next.module.subtitle} · Tund {next.lesson.lesson_number}/{next.total}
+          </Text>
+          <Text className="font-inter font-bold text-white text-base mt-1" numberOfLines={1}>
+            {next.lesson.name}
+          </Text>
+          <View className="mt-3">
+            <PixelProgress total={next.total} done={completedCounts[next.module.id] ?? 0} />
+          </View>
+          <Pressable
+            onPress={openLesson}
+            className="mt-3 self-start flex-row items-center gap-2 bg-[#F3DEFF] rounded-xl px-4 py-2"
+          >
+            <Text className="font-pixel text-[#543666] text-base">Jätka</Text>
+            <Ionicons name="play" size={14} color="#543666" />
+          </Pressable>
+        </>
+      ) : (
+        /* Folded: one slim line with a quick play button */
+        <View className="flex-row items-center justify-between mt-2">
+          <Text className="font-inter font-bold text-white text-base flex-1 pr-2" numberOfLines={1}>
+            {next.lesson.name}
+          </Text>
+          <Pressable onPress={openLesson} className="w-9 h-9 rounded-full bg-[#F3DEFF] items-center justify-center">
+            <Ionicons name="play" size={14} color="#543666" />
+          </Pressable>
+        </View>
+      )}
     </View>
-    <Bobbing>
-    <Image
-      source={require('../../assets/images/flowerlogo.png')}
-      style={{ width: 110, height: 110 }}
-      resizeMode="contain"
-    />
-    </Bobbing>
+
+    {/* The mascot only shows when the card is open */}
+    {cardOpen && (
+      <Bobbing>
+        <Image
+          source={require('../../assets/images/flowerlogo.png')}
+          style={{ width: 110, height: 110 }}
+          resizeMode="contain"
+        />
+      </Bobbing>
+    )}
   </View>
 ) : (
   <View className="w-full bg-[#543666] rounded-3xl p-4 mt-4" style={inputStyle}>

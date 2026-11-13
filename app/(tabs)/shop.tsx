@@ -3,6 +3,7 @@ import { Image, ScrollView, Text, View, Alert, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { roomImages } from "../../lib/roomImages";
 import { loadShop, buyItem, equipItem } from "../../lib/shop";
+import { niceAlert } from "../../components/niceAlert";
 
 export default function Shop() {
   const [items, setItems] = useState<any[]>([]);
@@ -22,14 +23,14 @@ export default function Shop() {
     if (item.equipped) return;
 
     if (item.owned) {
-      Alert.alert(item.name, 'Kas soovid selle kasutusele võtta?', [
+      niceAlert(item.name, 'Kas soovid selle kasutusele võtta?', [
         { text: 'Tühista', style: 'cancel' },
         {
           text: 'Kasuta',
           onPress: () => {
             equipItem(item.id)
               .then(refresh)
-              .catch((e) => Alert.alert('Ei õnnestunud', e.message));
+              .catch((e) => niceAlert('Ei õnnestunud', e.message));
           },
         },
       ]);
@@ -37,11 +38,11 @@ export default function Shop() {
     }
 
     if (coins < item.price) {
-      Alert.alert('Pole piisavalt kroone', `Vajad ${item.price - coins} rohkem kroone.`);
+      niceAlert('Pole piisavalt kroone', `Vajad ${item.price - coins} rohkem kroone.`);
       return;
     }
 
-    Alert.alert(`Osta ${item.name}?`, `${item.price} krooni`, [
+    niceAlert(`Osta ${item.name}?`, `${item.price} krooni`, [
       { text: 'Tühista', style: 'cancel' },
       {
         text: 'Osta',
@@ -50,7 +51,7 @@ export default function Shop() {
             await buyItem(item.id);
             refresh();
           } catch (e: any) {
-            Alert.alert('Ostmine ebaõnnestus', e.message);
+            niceAlert('Ostmine ebaõnnestus', e.message);
           }
         },
       },

@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri } from 'expo-auth-session';
 import * as QueryParams from 'expo-auth-session/build/QueryParams';
+import { niceAlert } from '../components/niceAlert';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -52,16 +53,16 @@ export default function AuthScreen() {
 
   const handleSubmit = async () => {
     if (!email || !password) {
-      Alert.alert('Please  fill in email and password');
+      niceAlert('Please  fill in email and password');
       return;
     }
       if (activeTab === 'signup') {
         if(!username) {
-          Alert.alert('Please choose a username');
+          niceAlert('Please choose a username');
           return;
         }
         if (password !== confirmPassword) {
-          Alert.alert('Passwords do not match');
+          niceAlert('Passwords do not match');
           return;
         }
     }
@@ -74,7 +75,7 @@ export default function AuthScreen() {
     setLoading(false);
 
     if (error){
-      Alert.alert(activeTab === 'signup' ? 'Signup failed' : 'Login failed', error.message);
+      niceAlert(activeTab === 'signup' ? 'Signup failed' : 'Login failed', error.message);
       return;
     }
 
@@ -92,7 +93,7 @@ export default function AuthScreen() {
       options: { redirectTo, skipBrowserRedirect: true },
     });
     if (error || !data?.url) {
-      Alert.alert('Google login failed', error?.message ?? 'No login page');
+      niceAlert('Google login failed', error?.message ?? 'No login page');
       return;
     }
 
@@ -103,7 +104,7 @@ export default function AuthScreen() {
     // 3. Read the login ticket from the address it came back with
     const { params, errorCode } = QueryParams.getQueryParams(result.url);
     if (errorCode) {
-      Alert.alert('Google login failed', errorCode);
+      niceAlert('Google login failed', errorCode);
       return;
     }
     const { access_token, refresh_token } = params;

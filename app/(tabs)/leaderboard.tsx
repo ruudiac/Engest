@@ -5,6 +5,7 @@ import { useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { supabase } from '../../lib/supabase';
 
+
 // Gold, silver, bronze for places 1–3
 const MEDALS = ['#F2C14E', '#C9C3D6', '#D99A6C'];
 

@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import { useFonts } from "expo-font";
+import { NiceAlertHost } from "../components/niceAlert";
 
 import {
   Inter_400Regular,
@@ -21,5 +22,10 @@ export default function RootLayout() {
 
   if (!fontsLoaded) return null;
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+    return (
+    <>
+      <Stack screenOptions={{ headerShown: false }} />
+      <NiceAlertHost />
+    </>
+  );
 }

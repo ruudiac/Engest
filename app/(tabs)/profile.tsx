@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase';
 import Bobbing from '../../components/bobbing';
 import PixelProgress from '../../components/pixelProgress';
 import Room from '../../components/room';
+import { niceAlert } from '../../components/niceAlert';
 
 
 export default function Profile() {
@@ -59,7 +60,7 @@ const level = Math.floor(xp/100) + 1;
 const xpInLevel = xp % 100;
 
 const logOut = () => {
-  Alert.alert('Log out?', 'You can log back in later.', [
+  niceAlert('Log out?', 'You can log back in later.', [
     {text: 'Cancel', style: 'cancel'},
     {text: 'Log out', style: 'destructive',
     onPress: async () => {

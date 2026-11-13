@@ -12,6 +12,7 @@ import { supabase } from "../lib/supabase";
 import HeartsBar from "../components/heartsBar";
 import MatchPairs from "../components/matchPairs";
 import LoadingScreen from "../components/loadingScreen";
+import {niceAlert} from '../components/niceAlert'
 
 // Picks a random quiz type that this card can actually support
 const pickQuizType = (c: any, prev: string) => {
@@ -176,7 +177,7 @@ export default function Lesson() {
               const left = await loseHeart();
               setHearts(left);
               if (left === 0) {
-                Alert.alert(
+                niceAlert(
                   "Südamed otsas!",
                   "You're out of hearts. Come back in 30 minutes.",
                   [{ text: "OK", onPress: () => router.replace("/(tabs)/dashboard" as any) }],
