@@ -60,25 +60,30 @@ export default function Lesson() {
   const notReady = !lesson || flashcards.length === 0;
   const total = mode === "quiz" ? quizorder.length : flashcards.length;
 
-  useEffect(() => {
-    setTimeout(() => {   // TEST ONLY: remove after
-      supabase
+    useEffect(() => {
+
+    const minTime = new Promise((r) => setTimeout(r, 3000));
+
+    const load = async () => {
+      const { data } = await supabase
         .from("lessons")
-              .select("*, cards(*)")
-      .eq("module_id", Number(moduleId))
-      .eq("lesson_number", Number(lessonId))
-      .order("position", { referencedTable: "cards" })
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          setLesson(data);
-          setFlashcards(
-            data.cards.map((c: any) => ({ ...c, image: images[c.image_key] })),
-          );
-        }
-        setLoading(false);
-        });
-    }, 3000);
+        .select("*, cards(*)")
+        .eq("module_id", Number(moduleId))
+        .eq("lesson_number", Number(lessonId))
+        .order("position", { referencedTable: "cards" })
+        .single();
+
+      await minTime;
+
+      if (data) {
+        setLesson(data);
+        setFlashcards(
+          data.cards.map((c: any) => ({ ...c, image: images[c.image_key] })),
+        );
+      }
+      setLoading(false);
+    };
+    load();
   }, []);
 
   useEffect(() => {

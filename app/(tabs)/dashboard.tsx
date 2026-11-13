@@ -9,6 +9,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Bobbing from '../../components/bobbing'
 import StreetStrip from '../../components/street'
 import { currentHearts, MAX_HEARTS } from '@/lib/hearts';
+import HelpButton from '../../components/helpButton';
 
 
 
@@ -170,7 +171,15 @@ const isUnlocked = (index: number) => {
     style={inputStyle}
   >
     <View className="flex-1 pr-2">
-      <Text className="font-pixel text-[#F3DEFF] text-lg">Jätka õppimist</Text>
+      <View className='flex-row items-center gap-2'>
+        <Text className="font-pixel text-[#F3DEFF] text-lg">Jätka õppimist</Text>
+      </View>
+      <View className="flex-row items-center gap-2 mt-1"flex-row items-center gap-2>
+        <HelpButton
+          titleEt="Jätka õppimist"
+          titleEn="Continue learning"
+          text="This card always shows your next lesson. Tap 'Jätka' to pick up where you left off."/>
+      </View>
       <Text className="font-inter text-[#CF8DF5] text-xs mt-1" numberOfLines={1}>
           {next.module.subtitle} · Tund {next.lesson.lesson_number}/{next.total}
       </Text>

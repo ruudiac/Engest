@@ -10,20 +10,23 @@ export default function Index() {
 
 
   useEffect(() => {
-    const check = async () => {
-       await new Promise((r) => setTimeout(r, 3000));
-      // 1. Logged in?
+        const check = async () => {
+      
+      const minTime = new Promise((r) => setTimeout(r, 5000));
+
+      let path = '/login_signup';
       const { data } = await supabase.auth.getSession();
-      if (!data?.session) return setTarget('/login_signup');
+      if (data?.session) {
+        const { data: p } = await supabase
+          .from('profiles')
+          .select('onboarded')
+          .eq('id', data.session.user.id)
+          .single();
+        path = p?.onboarded ? '/(tabs)/dashboard' : '/onboarding';
+      }
 
-      // 2. Onboarding done?
-      const { data: p } = await supabase
-        .from('profiles')
-        .select('onboarded')
-        .eq('id', data.session.user.id)
-        .single();
-
-      setTarget(p?.onboarded ? '/(tabs)/dashboard' : '/onboarding');
+      await minTime;
+      setTarget(path);
     };
     check().catch(() => setTarget('/login_signup'));
   }, []);
