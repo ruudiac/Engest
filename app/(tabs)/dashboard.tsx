@@ -140,28 +140,53 @@ const isUnlocked = (index: number) => {
         <Text className=" flex-2 text-center font-pixel text-5xl mt-4">Dashboard</Text>
     </View>
     
-
+    
     <View className="flex-row items-center justify-between w-full mt-2 mb-2">
-  <Pressable onPress={level} className="flex-row items-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2" style={{ width: 130, ...inputStyle }}>
+      <View>
+        <Pressable onPress={level} className="flex-row items-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2" style={{ width: 130, ...inputStyle }}>
     <View className="rounded-full bg-[#F3DEFF] border border-[#543666] overflow-hidden mr-2">
       <Image source={require('../../assets/images/star-removebg-preview.png')} style={{ width: 24, height: 24 }} resizeMode="contain"/>
     </View>
     <Text className="font-pixel text-black text-base">LEVEL: {currentLevel}</Text>
   </Pressable>
+  <View className="absolute -top-2 -right-2">
+      <HelpButton
+        titleEt="Tase"
+        titleEn="Levels"
+        text="Your level is determined by your total experience points (XP). The more XP you earn, the higher your level will be."/>
+    </View>
+    </View>
+  
 
-  <Pressable onPress={level} className="flex-row items-center justify-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2" style={{ width: 110, ...inputStyle }}>
-    {Array.from({ length: MAX_HEARTS}).map((_, i) => (
-      <Image key={i}
-      source={require('../../assets/images/_-2-removebg-preview.png')}
-      style={{ width: 28, height: 28, opacity: i < hearts ? 1 : 0.25 }}
-      resizeMode="contain"/>
-    ))}
-  </Pressable>
+   <View>
+    <Pressable onPress={level} className="flex-row items-center justify-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2" style={{ width: 110, ...inputStyle }}>
+      {Array.from({ length: MAX_HEARTS }).map((_, i) => (
+        <Image key={i}
+          source={require('../../assets/images/_-2-removebg-preview.png')}
+          style={{ width: 28, height: 28, opacity: i < hearts ? 1 : 0.25 }}
+          resizeMode="contain"/>
+      ))}
+    </Pressable>
+    <View className="absolute -top-2 -right-2">
+      <HelpButton
+        titleEt="Südamed"
+        titleEn="Hearts"
+        text="You lose a heart for each first wrong answer in a quiz. A new heart comes back every 30 minutes."/>
+    </View>
+  </View>
 
-  <Pressable onPress={level} className="flex-row items-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2 gap-2" style={{ width: 100, ...inputStyle }}>
-    <Image source={require('../../assets/images/moneystack.png')} style={{ width: 28, height: 28 }} resizeMode="contain"/>
-    <Text className="font-pixel text-black text-base">{coins}</Text>
-  </Pressable>
+    <View>
+    <Pressable onPress={level} className="flex-row items-center rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2 gap-2" style={{ width: 100, ...inputStyle }}>
+      <Image source={require('../../assets/images/moneystack.png')} style={{ width: 28, height: 28 }} resizeMode="contain"/>
+      <Text className="font-pixel text-black text-base">{coins}</Text>
+    </Pressable>
+    <View className="absolute -top-2 -right-2">
+      <HelpButton
+        titleEt="Kroonid"
+        titleEn="Kroons"
+        text="You earn kroons by finishing lessons. Spend them in the shop on things for your room."/>
+    </View>
+  </View>
 </View>
 
 {/* Continue card */}
@@ -170,11 +195,9 @@ const isUnlocked = (index: number) => {
     className="w-full bg-[#543666] rounded-3xl p-4 mt-4 flex-row items-center"
     style={inputStyle}
   >
-    <View className="flex-1 pr-2">
-      <View className='flex-row items-center gap-2'>
+        <View className="flex-1 pr-2">
+          <View className='flex-row items-center gap-2'>
         <Text className="font-pixel text-[#F3DEFF] text-lg">Jätka õppimist</Text>
-      </View>
-      <View className="flex-row items-center gap-2 mt-1"flex-row items-center gap-2>
         <HelpButton
           titleEt="Jätka õppimist"
           titleEn="Continue learning"
