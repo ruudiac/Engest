@@ -6,6 +6,11 @@ import React, { useRef, useState } from "react";
 import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View, Animated,  } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { supabase } from '@/lib/supabase';
+import * as WebBrowser from 'expo-web-browser';
+import { makeRedirectUri } from 'expo-auth-session';
+import * as QueryParams from 'expo-auth-session/build/QueryParams';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function AuthScreen() {
   const [activeTab, setActiveTab] = useState("login");
@@ -75,8 +80,38 @@ export default function AuthScreen() {
 
         router.replace('/' as any);
   };
-  const handleGoogle = () => {
-    console.log("Google sign in pressed");
+  
+    const handleGoogle = async () => {
+
+    const redirectTo = makeRedirectUri();
+        console.log('redirect', makeRedirectUri());
+
+    // 1. Ask Supabase for the Google login page address
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo, skipBrowserRedirect: true },
+    });
+    if (error || !data?.url) {
+      Alert.alert('Google login failed', error?.message ?? 'No login page');
+      return;
+    }
+
+    // 2. Open it in a browser window, and wait until it comes back to the app
+    const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+    if (result.type !== 'success') return; // closed or cancelled
+
+    // 3. Read the login ticket from the address it came back with
+    const { params, errorCode } = QueryParams.getQueryParams(result.url);
+    if (errorCode) {
+      Alert.alert('Google login failed', errorCode);
+      return;
+    }
+    const { access_token, refresh_token } = params;
+    if (!access_token) return;
+
+    // 4. Save the session, then let the start screen decide: onboarding or dashboard
+    await supabase.auth.setSession({ access_token, refresh_token });
+    router.replace('/' as any);
   };
 
   return (
