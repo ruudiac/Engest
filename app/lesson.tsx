@@ -23,6 +23,7 @@ const pickQuizType = (c: any, prev: string) => {
 }
 
 export default function Lesson() {
+  "use no memo";
   const { moduleId, lessonId } = useLocalSearchParams();
   const [lesson, setLesson] = useState<any>(null);
   const [flashcards, setFlashcards] = useState<any[]>([]);
@@ -129,7 +130,7 @@ export default function Lesson() {
     }
   };
 
-  const onQuizNext = async (wasCorrect: boolean) => {
+    const onQuizNext = async (wasCorrect: boolean, caseKey?: string) => {
             // a card counts as a mistake, costs a heart, only first time it is anwered wrong
             const firstMistake = !wasCorrect && !card.retry;
             const finalMistakes = firstMistake ? mistakes + 1 : mistakes;
@@ -142,6 +143,23 @@ export default function Lesson() {
               order = [...quizorder, { ...card, retry: true, quizType: pickQuizType(card, last.quizType) }];
               setQuizOrder(order);
             }
+
+          if (card.quizType !== 'match') {
+          supabase
+          .from('answers')
+          .insert({
+          card_id: card.id,
+          module_id: Number(moduleId),
+          lesson_number: Number(lessonId),
+          quiz_type: card.quizType,
+          case_key: caseKey ?? null,
+          correct: wasCorrect,
+          is_retry: !!card.retry,
+        })
+        .then(({ error }) => {
+          if (error) console.log('answer save failed', error.message);
+        });
+    }
 
             if (firstMistake) {
               setMistakes(finalMistakes);
@@ -203,6 +221,7 @@ export default function Lesson() {
   }
 
   if (notReady) {
+  
     return (
       <SafeAreaView className="flex-1 bg-[#F1D4FF] px-6 items-center justify-center">
         <Text className="text-center text-lg font-inter mt-10 text-[#543666]">
@@ -217,6 +236,9 @@ export default function Lesson() {
         </Pressable>
       </SafeAreaView>
     );
+  }
+  if (!card) {
+    return <SafeAreaView className="flex-1 bg-[#F1D4FF]" />;
   }
 
   return (

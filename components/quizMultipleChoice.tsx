@@ -139,7 +139,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
         <Pressable
           onPress={() => {
             setSelectedAnswer(null)
-            onNext(isCorrect)
+            onNext(isCorrect, caseInfo?.key)
           }}
           className='h-14 mt-6 rounded-2xl flex-row items-center justify-center gap-2 bg-[#543666]'
           style={{ shadowColor: '#543666', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 }}

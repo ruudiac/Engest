@@ -49,7 +49,7 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
             <Text allowFontScaling={false} numberOfLines={1} adjustsFontSizeToFit className="mt-3 font-inter text-center text-[#875BA1] font-bold" style={wordStyle(card.word)}>{card.word}</Text>
             <Text allowFontScaling={false} className="mt-3 text-[#CF8DF5] text-center font-inter" style={translationStyle(card.translation)}>
               {card.translation}</Text>
-
+        {card.cases && (
         <Pressable onPress= {() => setCasesOpen (!casesOpen) }
         className={`flex-row items-center self-center mt-4 px-5 py-2 rounded-full gap-2 ${
           casesOpen ? 'bg-[#543666]' : 'bg-[#F6E9FF]'
@@ -63,6 +63,7 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
             size={16}
             color={casesOpen ? '#F6E9FF' : '#7F39A6'}/>
         </Pressable>
+        )}
     </View>
     
 {/* Buttons */}
