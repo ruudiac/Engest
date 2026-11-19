@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Image, ScrollView, Text, View, Alert, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { roomImages } from "../../lib/roomImages";
+
 import { loadShop, buyItem, equipItem } from "../../lib/shop";
 import { niceAlert } from "../../components/niceAlert";
+import Character from '../../components/character';
 
 export default function Shop() {
   const [items, setItems] = useState<any[]>([]);
@@ -73,11 +74,10 @@ export default function Shop() {
             <Pressable key={item.id} onPress={() => onPress(item)} className="w-1/3 p-1">
               <View className="bg-white rounded-3xl border border-[#EBD5F7] items-center justify-between py-3" style={{ aspectRatio: 0.8 }}>
     
-                {roomImages[item.image_key] ? (
-                  <Image source={roomImages[item.image_key]} style={{ width: 64, height: 64 }} resizeMode="contain" />
-                ) : (
-                  <View className="rounded-xl bg-[#F6E9FF]" style={{ width: 64, height: 64 }} />
-                )}
+                
+                 {/* The item, worn by a mini character */}
+                <Character equipped={{ [item.slot]: item.image_key }} height={72} />
+  
 
 
                 <Text className="font-inter text-xs text-[#875BA1]" numberOfLines={1}>{item.name}</Text>

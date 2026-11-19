@@ -6,7 +6,7 @@ export async function loadShop() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: items } = await supabase.from("items").select("*");
+    const { data: items } = await supabase.from("items").select("*").eq("category", "clothes");
   const { data: mine } = await supabase
     .from("user_items")
     .select("*")

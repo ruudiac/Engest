@@ -6,8 +6,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { supabase } from '../../lib/supabase';
 import Bobbing from '../../components/bobbing';
 import PixelProgress from '../../components/pixelProgress';
-import Room from '../../components/room';
 import { niceAlert } from '../../components/niceAlert';
+import Character from '../../components/character';
 
 
 export default function Profile() {
@@ -85,9 +85,11 @@ return (
       Profile
     </Text>
 
-    <View style={{ marginHorizontal: -24, marginTop: -10, marginBottom: -30 }}>
-     <Room equipped={equipped} />
-   </View>
+    
+    <View className="items-center mt-6 mb-4">
+        <Character equipped={equipped} height={240} />
+      <View className="w-24 h-3 rounded-full bg-[#543666] opacity-20 -mt-1" />
+    </View>
    <View className="items-center">
      <Text className="font-pixel text-3xl text-[#543666]">{username}</Text>
      <Text className="font-inter text-sm text-[#875BA1]">{email}</Text>

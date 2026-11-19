@@ -106,7 +106,7 @@ export default function Dashboard() {
       { rect: stats, titleEt: 'Sinu edenemine', titleEn: 'Your progress', text: 'Your level, hearts and kroons. Tap any "?" to learn more.' },
       { rect: cont, titleEt: 'Jätka õppimist', titleEn: 'Continue learning', text: 'Your next lesson is always here. One tap and you are learning.' },
       { rect: mods, titleEt: 'Õppemoodulid', titleEn: 'Learning modules', text: 'All the topics. Finish one module to unlock the next.' },
-      { rect: menuRect, titleEt: 'Menüü', titleEn: 'Menu', text: 'Down here: the leaderboard, the shop and your own room.' },
+      { rect: menuRect, titleEt: 'Menüü', titleEn: 'Menu', text: 'Down here: the leaderboard, the shop and your own character.' },
     ]);
   };
 
@@ -235,7 +235,7 @@ const isUnlocked = (index: number) => {
       <HelpButton
         titleEt="Kroonid"
         titleEn="Kroons"
-        text="You earn kroons by finishing lessons. Spend them in the shop on things for your room."/>
+        text="You earn kroons by finishing lessons. Spend them in the shop on things for your character."/>
     </View>
   </View>
 </View>
