@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
 // The six persons, with English pronouns (and "to be" forms for verbs like "be late")
-const PERSONS = [
+export const PERSONS = [
   { key: 'ma',  en: 'I',         be: 'am',  third: false },
   { key: 'sa',  en: 'you',       be: 'are', third: false },
   { key: 'ta',  en: 'he/she',    be: 'is',  third: true },
@@ -12,7 +12,7 @@ const PERSONS = [
 ];
 
 // "To fix/To improve" -> "fix"
-const baseVerb = (translation: string) =>
+export const baseVerb = (translation: string) =>
   translation.split('/')[0].trim().replace(/^to\s+/i, '').toLowerCase();
 
 // he/she form: learn -> learns, finish -> finishes, apply -> applies, fill out -> fills out
@@ -27,7 +27,7 @@ const thirdPerson = (verb: string) => {
 };
 
 // "I learn", "he/she learns", "I am late"
-const english = (verb: string, p: (typeof PERSONS)[number]) => {
+export const english = (verb: string, p: (typeof PERSONS)[number]) => {
   if (verb === 'be' || verb.startsWith('be ')) return `${p.en} ${p.be}${verb.slice(2)}`;
   return `${p.en} ${p.third ? thirdPerson(verb) : verb}`;
 };

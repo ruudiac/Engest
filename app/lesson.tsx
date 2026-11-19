@@ -17,7 +17,8 @@ import {niceAlert} from '../components/niceAlert'
 // Picks a random quiz type that this card can actually support
 const pickQuizType = (c: any, prev: string) => {
   const types = ['et-en', 'en-et']
-  if (c.cases) types.push('case')
+  if (c.word_type === 'käändsõna' && c.cases) types.push('case')
+  if (c.word_type === 'pöördsõna' && c.conjugations) types.push('verb')
   if (c.has_audio) types.push('listen')
   if (c.image) types.push('picture')
   const options = types.filter((t) => t !== prev)

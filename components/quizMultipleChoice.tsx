@@ -3,6 +3,7 @@ import { Pressable, Text, View, Image } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { wordStyle, translationStyle, soundStyle } from './wordSize';
 import { CASES } from './casesModal';
+import { PERSONS, baseVerb, english } from './conjugationsModal';
 
 
 const QUIZ_CASES = ['sisseütlev', 'seesütlev', 'seestütlev', 'alaleütlev', 'alalütlev', 'alaltütlev', 'ilmaütlev', 'kaasaütlev'];
@@ -17,12 +18,23 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
     return usable[Math.floor(Math.random() * usable.length)]
   }, [card, type])
 
-  const answer = type === 'case' ? card.cases[caseInfo!.key] : card[answerKey]
+    // Pöörded quiz: one random person for this card (chosen once per card)
+  const personInfo = useMemo(() => {
+    if (type !== 'verb') return null
+    return PERSONS[Math.floor(Math.random() * PERSONS.length)]
+  }, [card, type])
+
+    const answer =
+    type === 'case' ? card.cases[caseInfo!.key]
+    : type === 'verb' ? card.conjugations[personInfo!.key]
+    : card[answerKey]
 
   const options = useMemo(() => {
 
-    const pool = type === 'case'
-      ? Object.values(card.cases)
+        // Case/verb quiz: other forms of the same word. Otherwise: answers from other cards.
+    const pool =
+      type === 'case' ? Object.values(card.cases)
+      : type === 'verb' ? PERSONS.map((p) => card.conjugations[p.key])
       : flashcards.map((f: any) => f[answerKey])
 
     const others = [...new Set(pool)]
@@ -36,10 +48,14 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
   const isCorrect = selectedAnswer === answer
   const showReveal = selectedAnswer !== null && !isCorrect
 
-    // After a miss: käänded questions show the right form, the others show the word
-  const revealWord = type === 'case' ? answer : card.word
-  const revealMeaning = type === 'case'
-    ? `"${caseInfo!.en.replaceAll('___', card.translation.toLowerCase())}"`
+  // After a miss: show the right form (case/verb questions) or the word (the others)
+  const revealWord =
+    type === 'case' ? answer
+    : type === 'verb' ? `${personInfo!.key} ${answer}`
+    : card.word
+  const revealMeaning =
+    type === 'case' ? `"${caseInfo!.en.replaceAll('___', card.translation.split('/')[0].trim().toLowerCase())}"`
+    : type === 'verb' ? english(baseVerb(card.translation), personInfo!)
     : card.translation
 
   const cardStyle = {
@@ -92,7 +108,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
           <>
 
             {type === 'et-en' && (
-              <Text allowFontScaling={false} className="font-bold text-[#543666] font-inter text-center" style={wordStyle(revealWord)}>{revealWord}</Text>
+                <Text allowFontScaling={false} className="font-bold text-[#543666] font-inter text-center" style={wordStyle(card.word)}>{card.word}</Text>
             )}
             {type === 'en-et' && (
               <Text allowFontScaling={false} className="font-bold text-[#543666] font-inter text-center" style={wordStyle(card.translation)}>{card.translation}</Text>
@@ -105,7 +121,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
                 <Ionicons name="volume-high" size={type === 'listen' ? 48 : 24} color="#7F39A6" />
               </Pressable>
             )}
-              {type === 'case' && (
+                          {type === 'case' && (
               <>
                 <Text className="font-inter text-base text-[#875BA1] text-center">
                   Which form of{' '}
@@ -113,10 +129,21 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
                   {' '}means…
                 </Text>
                 <Text className="font-bold text-3xl text-[#543666] font-inter text-center mt-3">
-                  "{caseInfo!.en.replaceAll('___', card.translation.toLowerCase())}"
+                  "{caseInfo!.en.replaceAll('___', card.translation.split('/')[0].trim().toLowerCase())}"
                 </Text>
                 <Text className="font-inter text-xs text-[#B48FCB] text-center mt-4">
                   {caseInfo!.key} · {caseInfo!.q} ({caseInfo!.qEn})
+                </Text>
+              </>
+            )}
+            {type === 'verb' && (
+              <>
+                <Text className="font-inter text-base text-[#875BA1] text-center">Which form fits?</Text>
+                <Text className="font-bold text-4xl text-[#543666] font-inter text-center mt-3">
+                  {personInfo!.key} ___
+                </Text>
+                <Text className="font-inter text-sm text-[#875BA1] text-center mt-3">
+                  {card.word.toLowerCase()} · {english(baseVerb(card.translation), personInfo!)}
                 </Text>
               </>
             )}
@@ -149,7 +176,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
       <Pressable
         onPress={() => {
           setSelectedAnswer(null)
-          onNext(isCorrect, caseInfo?.key)
+          onNext(isCorrect, caseInfo?.key ?? personInfo?.key)
         }}
         disabled={!selectedAnswer}
         className='h-14 mt-5 mb-2 rounded-2xl flex-row items-center justify-center gap-2 bg-[#543666]'

@@ -14,6 +14,7 @@ const SKILLS = [
   { key: 'listen',  et: 'Kuulamine',   en: 'Listening' },
   { key: 'picture', et: 'Pildid',      en: 'Pictures' },
   { key: 'case',    et: 'Käänded',     en: 'Cases' },
+  { key: 'verb',    et: 'Pöörded',     en: 'Verbs' },
 ];
 
 const MIN_ANSWERS = 5; // a skill needs this many answers before it gets a verdict
