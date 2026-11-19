@@ -4,6 +4,14 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import CasesModal from './casesModal';
 import { wordStyle, translationStyle, soundStyle } from './wordSize';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import ConjugationsModal from './conjugationsModal';
+
+// Word classes: Estonian name + a short English explanation
+const WORD_TYPES: Record<string, { et: string; en: string }> = {
+  'käändsõna': { et: 'käändsõna', en: 'changes its ending' },
+  'pöördsõna': { et: 'pöördsõna', en: 'verb' },
+  'muutumatu': { et: 'muutumatu', en: "doesn't change" },
+};
 
 export default function FlashcardMode({ card, currentIndex, flashcards, speakWord, onNext, onPrevious }:  any) {
 
@@ -24,6 +32,12 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
   }
 
   const [casesOpen, setCasesOpen] = useState(false);
+
+    const type = WORD_TYPES[card.word_type];
+  const isVerb = card.word_type === 'pöördsõna' && card.conjugations;
+
+  // Which forms button this word gets: Pöörded for verbs, Käänded for words with cases, none otherwise
+  const formsLabel = isVerb ? 'Pöörded' : card.cases ? 'Käänded' : null;
   
   return (
     <View className='flex-1'> 
@@ -55,21 +69,26 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
             <Text allowFontScaling={false} numberOfLines={1} adjustsFontSizeToFit className="mt-3 font-inter text-center text-[#875BA1] font-bold" style={wordStyle(card.word)}>{card.word}</Text>
             <Text allowFontScaling={false} className="mt-3 text-[#CF8DF5] text-center font-inter" style={translationStyle(card.translation)}>
               {card.translation}</Text>
-        {card.cases && (
-        <Pressable onPress= {() => setCasesOpen (!casesOpen) }
-        className={`flex-row items-center self-center mt-4 px-5 py-2 rounded-full gap-2 ${
-          casesOpen ? 'bg-[#543666]' : 'bg-[#F6E9FF]'
-        }`}>
+            {type && (
+        <Text className="text-center font-inter text-xs text-[#B48FCB] mt-1">
+          {type.et} · {type.en}
+        </Text>
+      )}
+              {formsLabel && (
+        <Pressable onPress={() => setCasesOpen(!casesOpen)}
+          className={`flex-row items-center self-center mt-4 px-5 py-2 rounded-full gap-2 ${
+            casesOpen ? 'bg-[#543666]' : 'bg-[#F6E9FF]'
+          }`}>
           <Text className={`text-base font-semibold font-inter ${
             casesOpen ? 'text-[#F6E9FF]' : 'text-[#7F39A6]'}`}>
-              Käänded
+            {formsLabel}
           </Text>
           <Ionicons
             name={casesOpen ? 'chevron-up' : 'chevron-down'}
             size={16}
             color={casesOpen ? '#F6E9FF' : '#7F39A6'}/>
         </Pressable>
-        )}
+      )}
     </View>
     
 {/* Buttons */}
@@ -100,8 +119,11 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
     />
   </Pressable>
 </View>
-
-    <CasesModal card={card} visible={casesOpen} onClose={() => setCasesOpen(false)} />
+    {isVerb ? (
+      <ConjugationsModal card={card} visible={casesOpen} onClose={() => setCasesOpen(false)} />
+    ) : (
+      <CasesModal card={card} visible={casesOpen} onClose={() => setCasesOpen(false)} />
+    )}
   </View>
   )
 }
