@@ -12,7 +12,8 @@ import { supabase } from "../lib/supabase";
 import HeartsBar from "../components/heartsBar";
 import MatchPairs from "../components/matchPairs";
 import LoadingScreen from "../components/loadingScreen";
-import {niceAlert} from '../components/niceAlert'
+import { getHardWords } from "../lib/hardWords";
+import { niceAlert } from "../components/niceAlert";
 
 // Picks a random quiz type that this card can actually support
 const pickQuizType = (c: any, prev: string) => {
@@ -27,7 +28,8 @@ const pickQuizType = (c: any, prev: string) => {
 
 export default function Lesson() {
   "use no memo";
-  const { moduleId, lessonId } = useLocalSearchParams();
+  const { moduleId, lessonId, review } = useLocalSearchParams();
+  const isReview = review === "1";
   const [lesson, setLesson] = useState<any>(null);
   const [flashcards, setFlashcards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,11 +64,25 @@ export default function Lesson() {
   const notReady = !lesson || flashcards.length === 0;
   const total = mode === "quiz" ? quizorder.length : flashcards.length;
 
-    useEffect(() => {
-
-    const minTime = new Promise((r) => setTimeout(r, 3000));
+  useEffect(() => {
+    // Keep the loading screen up for at least 1 second
+    const minTime = new Promise((r) => setTimeout(r, 1000));
 
     const load = async () => {
+      // Review: the user's hardest words, from any lesson
+      if (isReview) {
+        const ids = await getHardWords(10);
+        const { data } = ids.length
+          ? await supabase.from("cards").select("*").in("id", ids)
+          : { data: [] as any[] };
+        await minTime;
+        setLesson({ name: "Rasked sõnad", subtitle: "Your hardest words" });
+        setFlashcards((data ?? []).map((c: any) => ({ ...c, image: images[c.image_key] })));
+        setLoading(false);
+        return;
+      }
+
+      // Normal lesson
       const { data } = await supabase
         .from("lessons")
         .select("*, cards(*)")
@@ -79,9 +95,7 @@ export default function Lesson() {
 
       if (data) {
         setLesson(data);
-        setFlashcards(
-          data.cards.map((c: any) => ({ ...c, image: images[c.image_key] })),
-        );
+        setFlashcards(data.cards.map((c: any) => ({ ...c, image: images[c.image_key] })));
       }
       setLoading(false);
     };
@@ -103,7 +117,7 @@ export default function Lesson() {
       if (!p || p.is_admin) return;
       const h = currentHearts(p.hearts, p.hearts_updated_at);
       setHearts(h.hearts);
-      if (h.hearts === 0) setOutOfHearts(h.nextInMs);
+      if (h.hearts === 0 && !isReview) setOutOfHearts(h.nextInMs);
     };
     check();
   }, []);
@@ -173,7 +187,7 @@ export default function Lesson() {
         });
     }
 
-            if (firstMistake) {
+            if (firstMistake && !isReview) {
               setMistakes(finalMistakes);
               const left = await loseHeart();
               setHearts(left);
@@ -188,6 +202,15 @@ export default function Lesson() {
             }
 
             if (currentIndex === order.length - 1) {
+               // Review: no lesson progress to save, just a well done and back
+              if (isReview) {
+                niceAlert(
+                  "Hästi tehtud!",
+                  `You practised ${flashcards.length} hard words. The ones you got right will move down your list.`,
+                  [{ text: "OK", onPress: () => router.back() }],
+                );
+                return;
+              }
               router.push({
                 pathname: "/complete",
                 params: {
@@ -237,7 +260,7 @@ export default function Lesson() {
     return (
       <SafeAreaView className="flex-1 bg-[#F1D4FF] px-6 items-center justify-center">
         <Text className="text-center text-lg font-inter mt-10 text-[#543666]">
-          Not yet ready. Please check the lesson and flashcard data.
+          {isReview ? "No hard words right now. Nice work!" : "Not yet ready. Please check the lesson and flashcard data."}
         </Text>
         <Pressable
           onPress={() => router.back()}
@@ -263,7 +286,7 @@ export default function Lesson() {
         >
           <Ionicons name="caret-back" size={24} color="#7F39A6" />
         </Pressable>
-        {mode === "quiz" && <HeartsBar hearts={hearts} />}
+        {mode === "quiz" && !isReview && <HeartsBar hearts={hearts} />}
       </View>
 
       <Text className="text-right font-inter text-lg">
@@ -281,7 +304,7 @@ export default function Lesson() {
         {lesson.name}
       </Text>
       <Text className="text-center font-inter text-base text-[#875BA1]">
-        {`${lesson.lesson_number}. tund · ${lesson.subtitle}`}
+        {lesson.lesson_number ? `${lesson.lesson_number}. tund · ${lesson.subtitle}` : lesson.subtitle}
       </Text>
 
       {mode === "flashcard" ? (

@@ -200,6 +200,13 @@ export default function Stats() {
                     <Text className="font-inter text-sm text-[#8A2350]">missed {w.n}×</Text>
                   </View>
                 ))}
+                                <Pressable
+                  onPress={() => router.push({ pathname: '/lesson', params: { review: '1' } } as any)}
+                  className="h-12 mt-2 rounded-2xl flex-row items-center justify-center gap-2 bg-[#543666]"
+                >
+                  <Text className="font-inter font-semibold text-base text-white">Harjuta neid sõnu</Text>
+                  <Ionicons name="play" size={14} color="#FFFFFF" />
+                </Pressable>
               </>
             )}
           </>
