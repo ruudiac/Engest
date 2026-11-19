@@ -39,7 +39,7 @@ export default function Shop() {
     }
 
     if (coins < item.price) {
-      niceAlert('Pole piisavalt kroone', `Vajad ${item.price - coins} rohkem kroone.`);
+      niceAlert('Pole piisavalt kroone', `Vajad ${item.price - coins} krooni veel.`);
       return;
     }
 
