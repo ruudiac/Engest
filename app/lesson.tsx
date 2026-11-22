@@ -1,6 +1,6 @@
 import { currentHearts, loseHeart, MAX_HEARTS } from "@/lib/hearts";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
+import { createAudioPlayer } from "expo-audio";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Image, Pressable, Text, View } from "react-native";
@@ -124,7 +124,6 @@ export default function Lesson() {
 
   useEffect(() => {
     if (!card) return;
-    setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
 
     const uri = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/audio/cards/${card.id}.mp3`;
 
