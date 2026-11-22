@@ -1,6 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import NewsList from '../../components/newsList';
+import FactsList from '../../components/factsList';
 
 // The five sections of the Eesti tab, in display order
 const SECTIONS = [
@@ -33,11 +35,7 @@ export default function Eesti() {
                 <Text className="font-inter text-xs text-[#875BA1]">{s.en}</Text>
               </View>
             </View>
-
-            {/* Placeholder until the content is in */}
-            <View className="bg-white rounded-3xl border border-[#EBD5F7] px-4 py-6 items-center">
-              <Text className="font-inter text-sm text-[#B48FCB]">Coming soon</Text>
-            </View>
+             {s.key === 'news' ? <NewsList /> : <FactsList section={s.key} />}
           </View>
         ))}
       </ScrollView>
