@@ -8,7 +8,7 @@ import { PERSONS, baseVerb, english } from './conjugationsModal';
 
 const QUIZ_CASES = ['sisseütlev', 'seesütlev', 'seestütlev', 'alaleütlev', 'alalütlev', 'alaltütlev', 'ilmaütlev', 'kaasaütlev'];
 
-export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord, type = 'et-en' }: any) {
+export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord, type = 'et-en', onWrong }: any) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
 
   const answerKey = type === 'et-en' ? 'translation' : 'word'
@@ -158,9 +158,12 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
           return (
             <Pressable
               key={option}
-                onPress={() => {
+                 onPress={() => {
                 setSelectedAnswer(option)
-                if (option !== answer && card.has_audio) speakWord()
+                if (option !== answer) {
+                  if (card.has_audio) speakWord()
+                  onWrong?.()
+                }
               }}
               disabled={selectedAnswer !== null}
               className={`h-16 rounded-2xl border-2 px-5 flex-row items-center justify-center ${styles[state].box}`}

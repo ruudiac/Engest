@@ -156,24 +156,36 @@ export default function Lesson() {
     }
   };
 
-    const onQuizNext = async (wasCorrect: boolean, caseKey?: string) => {
-            // a card counts as a mistake, costs a heart, only first time it is anwered wrong
-            const firstMistake = !wasCorrect && !card.retry;
-            const finalMistakes = firstMistake ? mistakes + 1 : mistakes;
 
-            //anytime a card is answered wrong, goes back to the quiz queue, in a new quiz type
-            let order = quizorder;
+  const handleWrong = async () => {
+    if (card.retry || isReview) return;
+    setMistakes(mistakes + 1);
+    const left = await loseHeart();
+    setHearts(left);
+    if (left === 0) {
+      niceAlert(
+        "Südamed otsas!",
+        "You're out of hearts. Come back in 30 minutes.",
+        [{ text: "OK", onPress: () => router.replace("/(tabs)/dashboard" as any) }],
+      );
+    }
+  };
 
-            if (!wasCorrect) {
-              const last = quizorder[quizorder.length - 1];
-              order = [...quizorder, { ...card, retry: true, quizType: pickQuizType(card, last.quizType) }];
-              setQuizOrder(order);
-            }
+  const onQuizNext = async (wasCorrect: boolean, caseKey?: string) => {
+    // Any card answered wrong goes back into the quiz queue, in a new quiz type
+    let order = quizorder;
 
-          if (card.quizType !== 'match') {
-          supabase
-          .from('answers')
-          .insert({
+    if (!wasCorrect) {
+      const last = quizorder[quizorder.length - 1];
+      order = [...quizorder, { ...card, retry: true, quizType: pickQuizType(card, last.quizType) }];
+      setQuizOrder(order);
+    }
+
+    // Save the answer (not for match pairs)
+    if (card.quizType !== 'match') {
+      supabase
+        .from('answers')
+        .insert({
           card_id: card.id,
           module_id: Number(moduleId),
           lesson_number: Number(lessonId),
@@ -187,44 +199,31 @@ export default function Lesson() {
         });
     }
 
-            if (firstMistake && !isReview) {
-              setMistakes(finalMistakes);
-              const left = await loseHeart();
-              setHearts(left);
-              if (left === 0) {
-                niceAlert(
-                  "Südamed otsas!",
-                  "You're out of hearts. Come back in 30 minutes.",
-                  [{ text: "OK", onPress: () => router.replace("/(tabs)/dashboard" as any) }],
-                );
-                return;
-              }
-            }
-
-            if (currentIndex === order.length - 1) {
-               // Review: no lesson progress to save, just a well done and back
-              if (isReview) {
-                niceAlert(
-                  "Hästi tehtud!",
-                  `You practised ${flashcards.length} hard words. The ones you got right will move down your list.`,
-                  [{ text: "OK", onPress: () => router.back() }],
-                );
-                return;
-              }
-              router.push({
-                pathname: "/complete",
-                params: {
-                  mistakes: String(finalMistakes),
-                  total: String(flashcards.length),
-                  lessonId: String(lesson.lesson_number),
-                  moduleId: String(moduleId),
-                  moduleName: lesson.name,
-                },
-              });
-            } else {
-              setCurrentIndex(currentIndex + 1);
-            }
-          }
+    if (currentIndex === order.length - 1) {
+      // Review: no lesson progress to save, just a well done and back
+      if (isReview) {
+        niceAlert(
+          "Hästi tehtud!",
+          `You practised ${flashcards.length} hard words. The ones you got right will move down your list.`,
+          [{ text: "OK", onPress: () => router.back() }],
+        );
+        return;
+      }
+      router.push({
+        pathname: "/complete",
+        params: {
+          mistakes: String(mistakes),
+          total: String(flashcards.length),
+          lessonId: String(lesson.lesson_number),
+          moduleId: String(moduleId),
+          moduleName: lesson.name,
+        },
+      });
+    } else {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+  
   if (loading) {
     return <LoadingScreen />;
   }
@@ -342,6 +341,7 @@ export default function Lesson() {
           flashcards={quizorder}
           speakWord={speakWord}
           onNext={onQuizNext}
+          onWrong={handleWrong}
         />
       )}
     </SafeAreaView>
