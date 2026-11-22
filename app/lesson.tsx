@@ -266,7 +266,7 @@ export default function Lesson() {
           className="mt-4 px-4 py-2 bg-[#E2BFF6] border border-[#543666] rounded-full"
           style={inputStyle}
         >
-          <Text className="font-pixel">Tagasi</Text>
+          <Text className="font-pixel">Back</Text>
         </Pressable>
       </SafeAreaView>
     );
@@ -303,7 +303,7 @@ export default function Lesson() {
         {lesson.name}
       </Text>
       <Text className="text-center font-inter text-base text-[#875BA1]">
-        {lesson.lesson_number ? `${lesson.lesson_number}. tund · ${lesson.subtitle}` : lesson.subtitle}
+        {lesson.lesson_number ? `Lesson ${lesson.lesson_number} · ${lesson.subtitle}` : lesson.subtitle}
       </Text>
 
       {mode === "flashcard" ? (

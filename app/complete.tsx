@@ -70,9 +70,10 @@ export default function Complete() {
       <View className="items-center">
         <Image source={require('../assets/images/flowerlogo.png')} style={{ width: 400, height: 400 }} />
       </View>
-  
-      <Text className="text-4xl font-bold text-[#543666] mt-4 text-center">Congratulations!</Text>
-      <Text className="font-pixel text-2xl text-center text-[#675F5F] mb-6">You've completed the lesson.</Text>
+      
+      <Text className="text-4xl font-bold text-[#543666] mt-4 text-center">Palju õnne!</Text>
+      <Text className="font-inter text-base text-center text-[#875BA1]">Congratulations!</Text>
+      <Text className="font-pixel text-2xl text-center text-[#675F5F] mb-6 mt-2">You've completed the lesson.</Text>
   
       {/* Stats */}
       <View className="flex-row gap-3">

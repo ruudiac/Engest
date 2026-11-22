@@ -87,7 +87,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
           <View className='bg-[#E2BFF6] rounded-3xl mt-4 items-center justify-center mb-5 px-6 flex-1' style={cardStyle}>
           {showReveal ? (
           <>
-            <Text className="font-inter text-sm text-[#875BA1] mb-2">Vaatame veel kord</Text>
+            <Text className="font-inter text-sm text-[#875BA1] mb-2">Vaatame veel kord · Let's look again</Text>
             {card.image && (
               <Image source={card.image} style={{ width: 100, height: 100 }} resizeMode="contain" />
             )}

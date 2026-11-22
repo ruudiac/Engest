@@ -187,8 +187,9 @@ const isUnlocked = (index: number) => {
   >
     <StreetStrip />
   </View>
-    <View className=" flex-row items-center gap-5"> 
-        <Text className=" flex-2 text-center font-pixel text-5xl mt-4">Dashboard</Text>
+    <View className="items-center mt-4">
+       <Text className="font-pixel text-5xl">Avaleht</Text>
+       <Text className="font-inter text-sm text-[#875BA1]">Dashboard</Text>
     </View>
     
     
@@ -260,12 +261,13 @@ const isUnlocked = (index: number) => {
           titleEn="Continue learning"
           text="This card always shows your next lesson. Tap 'Jätka' to pick up where you left off. Tap the title to fold the card."/>
       </View>
+            <Text className="font-inter text-[#F3DEFF] text-xs opacity-70">Continue learning</Text>
 
       {cardOpen ? (
         <>
           {/* Open: the full card */}
           <Text className="font-inter text-[#CF8DF5] text-xs mt-1" numberOfLines={1}>
-            {next.module.subtitle} · Tund {next.lesson.lesson_number}/{next.total}
+            {next.module.subtitle} · Lesson {next.lesson.lesson_number}/{next.total}
           </Text>
           <Text className="font-inter font-bold text-white text-base mt-1" numberOfLines={1}>
             {next.lesson.name}
@@ -277,7 +279,7 @@ const isUnlocked = (index: number) => {
             onPress={openLesson}
             className="mt-3 self-start flex-row items-center gap-2 bg-[#F3DEFF] rounded-xl px-4 py-2"
           >
-            <Text className="font-pixel text-[#543666] text-base">Jätka</Text>
+            <Text className="font-pixel text-[#543666] text-base">Continue</Text>
             <Ionicons name="play" size={14} color="#543666" />
           </Pressable>
         </>
@@ -307,15 +309,14 @@ const isUnlocked = (index: number) => {
   </View>
 ) : (
   <View className="w-full bg-[#543666] rounded-3xl p-4 mt-4" style={inputStyle}>
-    <Text className="font-pixel text-[#F3DEFF] text-lg">Kõik tehtud! 🎉</Text>
+    <Text className="font-pixel text-[#F3DEFF] text-lg">Kõik tehtud!</Text>
     <Text className="font-inter text-[#CF8DF5] text-sm mt-1">You've finished every lesson.</Text>
   </View>
 )}
 
 <View ref={modulesRef} collapsable={false} className='w-full'>
-    <Text className="font-pixel text-black text-3xl mr-5 mt-4 w-full text-left">
-        Learning modules
-      </Text>
+    <Text className="font-pixel text-black text-3xl mt-4 w-full text-left">Õppemoodulid</Text>
+    <Text className="font-inter text-sm text-[#875BA1] w-full text-left">Learning modules</Text>
     </View>
 
 

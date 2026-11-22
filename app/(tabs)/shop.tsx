@@ -5,11 +5,12 @@ import ItemPreview from '../../components/itemPreview';
 import { loadShop, buyItem, equipItem } from "../../lib/shop";
 import { niceAlert } from "../../components/niceAlert";
 import Character from '../../components/character';
+import  Bi  from "../../components/bi";
 
 const TABS = [
-  { key: 'all', label: 'Kõik' },
-  { key: 'top', label: 'Särgid' },
-  { key: 'bottom', label: 'Püksid' },
+  { key: 'all', label: 'All' },
+  { key: 'top', label: 'Tops' },
+  { key: 'bottom', label: 'Bottoms' },
 ];
 
 
@@ -60,7 +61,7 @@ export default function Shop() {
     <SafeAreaView className="flex-1 bg-[#F1D4FF] px-6">
       {/* Header: title + kroonid */}
       <View className="flex-row items-center justify-between mt-4 mb-4">
-        <Text className="text-3xl font-bold font-inter text-[#543666]">Pood</Text>
+        <Bi et="Pood" en="Shop" />
         <View className="flex-row items-center gap-2 bg-white rounded-full px-3 py-1 border border-[#EBD5F7]">
           <Image source={require('../../assets/images/moneystack.png')} style={{ width: 24, height: 24 }} resizeMode="contain" />
           <Text className="font-pixel text-lg text-[#543666]">{coins}</Text>

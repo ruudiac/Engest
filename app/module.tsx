@@ -78,14 +78,17 @@ return (
   </View>
   <View className=' w-full items-center' >
           <Text className="font-pixel text-black text-2xl mt-4 w-full text-center">{mod?.subtitle}</Text>
-        <Text className="font-inter text-[#875BA1] text-base w-full text-center">{`${id}. moodul · ${mod?.name ?? ''}`}</Text>
+        <Text className="font-inter text-[#875BA1] text-base w-full text-center">{`${id}. Module · ${mod?.name ?? ''}`}</Text>
       </View>
-      <View className='w-full'>
-        <Text className='text-center font- mt-3 text-xl'>Completed</Text>
+        <Text className="font-inter text-base text-[#543666] text-center mt-3">
+        <Text className="font-bold">{completedCount}/{lessons.length}</Text> lessons completed · läbitud
+      </Text>
+      <View className="w-full h-5 border border-[#543666] bg-[#CF8DF5] rounded-full mt-2 overflow-hidden">
+        <View
+          className="h-full bg-[#7F39A6]"
+          style={{ width: `${lessons.length ? (completedCount / lessons.length) * 100 : 0}%` }}
+        />
       </View>
-      <View className='w-full h-5 border border-[#543666] bg-[#CF8DF5] rounded-full mt-2 overflow-hidden'>
-      <Text className='text-center font-inter mt-3 text-xl'>{`${completedCount}/${lessons.length} läbitud`}</Text>
-  </View>
   <FlatList
   className='w-full mt-4'
    data={lessons}

@@ -7,7 +7,7 @@ import LoadingScreen from '../components/loadingScreen';
 import ProgressChart from '../components/progressChart';
 import { supabase } from '../lib/supabase';
 
-// The skills, matching the quiz types we save
+
 const SKILLS = [
   { key: 'et-en',   et: 'Lugemine',    en: 'Reading (ET → EN)' },
   { key: 'en-et',   et: 'Meenutamine', en: 'Recall (EN → ET)' },
@@ -17,9 +17,9 @@ const SKILLS = [
   { key: 'verb',    et: 'Pöörded',     en: 'Verbs' },
 ];
 
-const MIN_ANSWERS = 5; // a skill needs this many answers before it gets a verdict
+const MIN_ANSWERS = 5; 
 
-const MONTHS = ['jaan', 'veebr', 'märts', 'apr', 'mai', 'juuni', 'juuli', 'aug', 'sept', 'okt', 'nov', 'dets'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 // Badge look for a percentage
 const badge = (pct: number) =>
@@ -92,7 +92,7 @@ export default function Stats() {
   }
   const days = Object.keys(byDay).sort().map((k) => {
     const [, m, d] = k.split('-').map(Number);
-    return { label: `${d}. ${MONTHS[m - 1]}`, value: pct(byDay[k]) };
+    return { label: `${d} ${MONTHS[m - 1]}`, value: pct(byDay[k]) };
   });
 
   const values = days.map((d) => d.value);
@@ -102,10 +102,11 @@ export default function Stats() {
   const trend = !earlier.length
     ? null
     : diff > 3
-      ? { text: '↑ Tõuseb', color: 'text-[#2F6B22]' }
+      ? { text: '↑ Improving', color: 'text-[#2F6B22]' }
       : diff < -3
-        ? { text: '↓ Langeb', color: 'text-[#C26A00]' }
-        : { text: '→ Püsib', color: 'text-[#875BA1]' };
+        ? { text: '↓ Dropping', color: 'text-[#C26A00]' }
+        : { text: '→ Steady', color: 'text-[#875BA1]' };
+
 
   // ---------- The screen ----------
 
@@ -138,11 +139,10 @@ export default function Stats() {
             {/* Progress over time */}
             <View className="bg-white rounded-3xl border border-[#EBD5F7] p-4 mb-4">
               <View className="flex-row items-end gap-2 mb-1">
-                <Text className="font-inter text-xs font-bold tracking-widest text-[#875BA1]">ÕPPIMISE ARENG</Text>
-                {trend && <Text className={`font-inter font-bold text-sm ${trend.color}`}>{trend.text}</Text>}
+                <Text className="font-inter text-xs font-bold tracking-widest text-[#875BA1]">ÕPPIMISE ARENG · LEARNING PROGRESS</Text>
               </View>
               <Text className="font-inter text-xs text-[#875BA1] mb-2">
-                Vahemik: <Text className="font-bold">{Math.min(...values)}% – {Math.max(...values)}%</Text> · {days.length} päeva
+                Range: <Text className="font-bold">{Math.min(...values)}% – {Math.max(...values)}%</Text> · {days.length} {days.length === 1 ? 'day' : 'days'}
               </Text>
 
               {days.length >= 2 ? (
@@ -204,7 +204,7 @@ export default function Stats() {
                   onPress={() => router.push({ pathname: '/lesson', params: { review: '1' } } as any)}
                   className="h-12 mt-2 rounded-2xl flex-row items-center justify-center gap-2 bg-[#543666]"
                 >
-                  <Text className="font-inter font-semibold text-base text-white">Harjuta neid sõnu</Text>
+                 <Text className="font-inter font-semibold text-base text-white">Practise these words</Text>
                   <Ionicons name="play" size={14} color="#FFFFFF" />
                 </Pressable>
               </>
