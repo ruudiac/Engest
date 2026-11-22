@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Entypo from '@expo/vector-icons/Entypo';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 // The active tab's icon sits in a framed "slot", like a game inventory
 function Slot({ focused, children }: { focused: boolean; children: React.ReactNode }) {
@@ -65,6 +66,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Slot focused={focused}><AntDesign name="smile" size={22} color={color} /></Slot>
           ),
+        }}
+      />
+            <Tabs.Screen
+        name="eesti"
+        options={{
+          title: 'Eesti',
+          tabBarIcon: ({ color, size }) => <Ionicons name="earth" size={size} color={color} />,
         }}
       />
     </Tabs>
