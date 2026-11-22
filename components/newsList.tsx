@@ -1,16 +1,21 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as WebBrowser from 'expo-web-browser';
-import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, Text, View } from 'react-native';
 import { getNews, NewsItem } from '../lib/errNews';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 
 export default function NewsList() {
   const [news, setNews] = useState<NewsItem[] | null>(null);
   const [failed, setFailed] = useState(false);
 
-  useEffect(() => {
-    getNews(5).then(setNews).catch(() => setFailed(true));
-  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      setFailed(false);
+      getNews(5).then(setNews).catch(() => setFailed(true));
+    }, []),
+  );
 
   if (failed) {
     return (
