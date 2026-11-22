@@ -23,18 +23,30 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
     if (type !== 'verb') return null
     return PERSONS[Math.floor(Math.random() * PERSONS.length)]
   }, [card, type])
+    // Sentence quiz: one random sentence for this card (chosen once per card)
+  const sentence = useMemo(() => {
+    if (type !== 'sentence') return null
+    return card.sentences[Math.floor(Math.random() * card.sentences.length)]
+  }, [card, type])
 
+  // Fits a form into the sentence: capital letter only if the gap starts the sentence
+  const fit = (form: string) => {
+    const f = form.toLowerCase()
+    return sentence?.et.startsWith('___') ? f[0].toUpperCase() + f.slice(1) : f
+  }
     const answer =
     type === 'case' ? card.cases[caseInfo!.key]
     : type === 'verb' ? card.conjugations[personInfo!.key]
+    : type === 'sentence' ? fit(card.cases[sentence!.case_key])
     : card[answerKey]
 
   const options = useMemo(() => {
 
         // Case/verb quiz: other forms of the same word. Otherwise: answers from other cards.
-    const pool =
+     const pool =
       type === 'case' ? Object.values(card.cases)
       : type === 'verb' ? PERSONS.map((p) => card.conjugations[p.key])
+      : type === 'sentence' ? QUIZ_CASES.map((k) => card.cases[k]).filter(Boolean).map(fit)
       : flashcards.map((f: any) => f[answerKey])
 
     const others = [...new Set(pool)]
@@ -49,13 +61,15 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
   const showReveal = selectedAnswer !== null && !isCorrect
 
   // After a miss: show the right form (case/verb questions) or the word (the others)
-  const revealWord =
+    const revealWord =
     type === 'case' ? answer
     : type === 'verb' ? `${personInfo!.key} ${answer}`
+    : type === 'sentence' ? sentence!.et.replace('___', answer)
     : card.word
   const revealMeaning =
     type === 'case' ? `"${caseInfo!.en.replaceAll('___', card.translation.split('/')[0].trim().toLowerCase())}"`
     : type === 'verb' ? english(baseVerb(card.translation), personInfo!)
+    : type === 'sentence' ? sentence!.en
     : card.translation
 
   const cardStyle = {
@@ -94,9 +108,9 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
             <Text allowFontScaling={false} numberOfLines={1} adjustsFontSizeToFit className="font-bold text-[#543666] font-inter text-center" style={wordStyle(revealWord)}>
               {revealWord}
             </Text>
-            <Text className="font-inter text-xl text-[#875BA1] mt-1">{revealMeaning}</Text>
-            {type === 'case' && (
-              <Text className="font-inter text-xs text-[#B48FCB] mt-1">{caseInfo!.key}</Text>
+                        <Text className="font-inter text-xl text-[#875BA1] mt-1">{revealMeaning}</Text>
+            {(type === 'case' || type === 'sentence') && (
+              <Text className="font-inter text-xs text-[#B48FCB] mt-1">{caseInfo?.key ?? sentence?.case_key}</Text>
             )}
             {card.has_audio && (
               <Pressable onPress={speakWord} className="absolute top-4 left-4 w-12 h-12 rounded-full bg-[#F6E9FF] items-center justify-center z-10">
@@ -147,6 +161,17 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
                 </Text>
               </>
             )}
+             {type === 'sentence' && (
+              <>
+                <Text className="font-inter text-base text-[#875BA1] text-center">Fill in the gap</Text>
+                <Text className="font-bold text-3xl text-[#543666] font-inter text-center mt-3">
+                  {sentence!.et}
+                </Text>
+                <Text className="font-inter text-sm text-[#875BA1] text-center mt-3">
+                  ({card.word.toLowerCase()}) · {sentence!.en}
+                </Text>
+              </>
+            )}
           </>
         )}
       </View>
@@ -179,7 +204,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
       <Pressable
         onPress={() => {
           setSelectedAnswer(null)
-          onNext(isCorrect, caseInfo?.key ?? personInfo?.key)
+         onNext(isCorrect, caseInfo?.key ?? personInfo?.key ?? sentence?.case_key)
         }}
         disabled={!selectedAnswer}
         className='h-14 mt-5 mb-2 rounded-2xl flex-row items-center justify-center gap-2 bg-[#543666]'

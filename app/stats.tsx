@@ -15,6 +15,7 @@ const SKILLS = [
   { key: 'picture', et: 'Pildid',      en: 'Pictures' },
   { key: 'case',    et: 'Käänded',     en: 'Cases' },
   { key: 'verb',    et: 'Pöörded',     en: 'Verbs' },
+  { key: 'sentence', et: 'Laused', en: 'Sentences' },
 ];
 
 const MIN_ANSWERS = 5; 
