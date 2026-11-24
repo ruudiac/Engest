@@ -112,7 +112,7 @@ return (
          </View>
 
          <Pressable
-           onPress={() => router.push({ pathname: '/lesson', params: { moduleId: id, lessonId: item.lesson_number } })}
+           onPress={() => router.push({ pathname: item.kind === 'grammar' ? '/grammar' : '/lesson', params: { moduleId: id, lessonId: item.lesson_number } })}
            className={`rounded-3xl m-2 p-4 flex-1 flex-row items-center gap-3 border ${
              isNext ? 'bg-[#E2BFF6] border-[#543666] border-2' : isDone ? 'bg-[#F3E6FA] border-[#CF8DF5]' : 'bg-[#E2BFF6] border-[#875BA1]'
            }`}

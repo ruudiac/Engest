@@ -80,9 +80,9 @@ export default function Dashboard() {
 
   const openLesson = () =>
   router.push({
-    pathname: '/lesson',
+    pathname: next.lesson.kind === 'grammar' ? '/grammar' : '/lesson',
     params: { moduleId: next.module.id, lessonId: next.lesson.lesson_number },
-  })
+  } as any)
 
   const measure = (ref: any) =>
     new Promise<any>((resolve) => {
@@ -119,8 +119,8 @@ export default function Dashboard() {
   useEffect(() => {
     supabase
       .from('modules')
-      .select('*, lessons(lesson_number, name)')
-      .order('id')
+      .select('*, lessons(lesson_number, name, kind)')
+      .order('position')
       .then(({ data }) => { if (data) setModules(data) })
   }, [])
 

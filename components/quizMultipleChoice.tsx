@@ -8,7 +8,7 @@ import { PERSONS, baseVerb, english } from './conjugationsModal';
 
 const QUIZ_CASES = ['sisseütlev', 'seesütlev', 'seestütlev', 'alaleütlev', 'alalütlev', 'alaltütlev', 'ilmaütlev', 'kaasaütlev'];
 
-export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord, type = 'et-en', onWrong }: any) {
+export default function QuizMultipleChoice({ card, flashcards, onNext, caseKeys, speakWord, type = 'et-en', onWrong }: any) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
 
   const answerKey = type === 'et-en' ? 'translation' : 'word'
@@ -46,7 +46,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, speakWord
      const pool =
       type === 'case' ? Object.values(card.cases)
       : type === 'verb' ? PERSONS.map((p) => card.conjugations[p.key])
-      : type === 'sentence' ? QUIZ_CASES.map((k) => card.cases[k]).filter(Boolean).map(fit)
+      : type === 'sentence' ? (caseKeys ?? QUIZ_CASES).map((k: string) => card.cases[k]).filter(Boolean).map(fit)
       : flashcards.map((f: any) => f[answerKey])
 
     const others = [...new Set(pool)]
