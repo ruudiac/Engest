@@ -1,6 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createAudioPlayer } from 'expo-audio';
+import { audioSlug } from '../lib/audioSlug';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CASES } from '../components/casesModal';
@@ -34,6 +36,21 @@ export default function Grammar() {
   const [step, setStep] = useState(-1);
   const [index, setIndex] = useState(0); // which practice question
   const [mistakes, setMistakes] = useState(0);
+
+    // One audio player for the example sentences
+  const playerRef = useRef<ReturnType<typeof createAudioPlayer> | null>(null);
+  useEffect(() => () => playerRef.current?.remove(), []);
+
+  const playExample = (et: string) => {
+    const uri = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/audio/grammar/${audioSlug(et)}.mp3`;
+    try {
+      if (!playerRef.current) playerRef.current = createAudioPlayer(uri);
+      else playerRef.current.replace(uri);
+      playerRef.current.play();
+    } catch (e) {
+      console.log('example audio failed', e);
+    }
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -219,9 +236,17 @@ export default function Grammar() {
 
               <Text className="font-inter font-bold text-xs tracking-widest text-[#875BA1] mt-5 mb-2">EXAMPLES</Text>
               {c.examples.map((e, i) => (
-                <View key={i} className="rounded-2xl bg-[#F3E6FA] px-4 py-3 mb-2">
-                  <Highlight text={e.et} />
-                  <Text className="font-inter text-sm text-[#875BA1] mt-1">{e.en}</Text>
+                <View key={i} className="flex-row items-center gap-3 rounded-2xl bg-[#F3E6FA] px-4 py-3 mb-2">
+                  <View className="flex-1">
+                    <Highlight text={e.et} />
+                    <Text className="font-inter text-sm text-[#875BA1] mt-1">{e.en}</Text>
+                  </View>
+                  <Pressable
+                    onPress={() => playExample(e.et)}
+                    className="w-10 h-10 rounded-full bg-white items-center justify-center"
+                  >
+                    <Ionicons name="volume-high" size={20} color="#7F39A6" />
+                  </Pressable>
                 </View>
               ))}
             </View>
