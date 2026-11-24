@@ -121,8 +121,12 @@ export default function Dashboard() {
       .from('modules')
       .select('*, lessons(lesson_number, name, kind)')
       .order('position')
-      .then(({ data }) => { if (data) setModules(data) })
+      .then(({ data, error }) => {
+        if (error) console.log('modules load failed', error.message);
+        if (data) setModules(data);
+      })
   }, [])
+
 
   useFocusEffect(
     useCallback(() => {
@@ -188,7 +192,7 @@ const isUnlocked = (index: number) => {
     <StreetStrip />
   </View>
     <View className="items-center mt-4">
-       <Text className="font-pixel text-5xl">Avaleht</Text>
+<Text className="font-pixel text-5xl">Avaleht</Text>
        <Text className="font-inter text-sm text-[#875BA1]">Dashboard</Text>
     </View>
     

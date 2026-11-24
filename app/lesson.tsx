@@ -14,10 +14,12 @@ import MatchPairs from "../components/matchPairs";
 import LoadingScreen from "../components/loadingScreen";
 import { getHardWords } from "../lib/hardWords";
 import { niceAlert } from "../components/niceAlert";
+import { getLearnedCases } from "../lib/learnedCases";
 
 // Picks a random quiz type that this card can actually support
-const pickQuizType = (c: any, prev: string) => {
+const pickQuizType = (c: any, prev: string, learned: string[]) => {
   const types = ['et-en', 'en-et']
+  if (c.word_type === 'käändsõna' && c.cases && learned.some((k) => c.cases[k])) types.push('case')
   if (c.word_type === 'käändsõna' && c.cases && c.sentences?.length) types.push('sentence')
   if (c.word_type === 'pöördsõna' && c.conjugations) types.push('verb')
   if (c.has_audio) types.push('listen')
@@ -34,6 +36,7 @@ export default function Lesson() {
   const [flashcards, setFlashcards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [hearts, setHearts] = useState(MAX_HEARTS);
+  const [learnedCases, setLearnedCases] = useState<string[]>([]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mode, setMode] = useState("flashcard");
@@ -69,15 +72,24 @@ export default function Lesson() {
     const minTime = new Promise((r) => setTimeout(r, 1000));
 
     const load = async () => {
+      const learned = await getLearnedCases();
+      setLearnedCases(learned);
+
+      // Prepare a card: its image, and only sentences for cases the user has learned
+      const prepare = (c: any) => ({
+        ...c,
+        image: images[c.image_key],
+        sentences: (c.sentences ?? []).filter((s: any) => learned.includes(s.case_key)),
+      });
       // Review: the user's hardest words, from any lesson
       if (isReview) {
         const ids = await getHardWords(10);
         const { data } = ids.length
-          ? await supabase.from("cards").select("*").in("id", ids)
+          ? await supabase.from("cards").select("*, sentences(*)").in("id", ids)
           : { data: [] as any[] };
         await minTime;
         setLesson({ name: "Rasked sõnad", subtitle: "Your hardest words" });
-        setFlashcards((data ?? []).map((c: any) => ({ ...c, image: images[c.image_key] })));
+        setFlashcards((data ?? []).map(prepare));
         setLoading(false);
         return;
       }
@@ -95,7 +107,7 @@ export default function Lesson() {
 
       if (data) {
         setLesson(data);
-        setFlashcards(data.cards.map((c: any) => ({ ...c, image: images[c.image_key] })));
+        setFlashcards(data.cards.map(prepare));
       }
       setLoading(false);
     };
@@ -176,7 +188,7 @@ export default function Lesson() {
 
     if (!wasCorrect) {
       const last = quizorder[quizorder.length - 1];
-      order = [...quizorder, { ...card, retry: true, quizType: pickQuizType(card, last.quizType) }];
+      order = [...quizorder, { ...card, retry: true, quizType: pickQuizType(card, last.quizType, learnedCases) }];
       setQuizOrder(order);
     }
 
@@ -318,7 +330,7 @@ export default function Lesson() {
               const shuffled = [...flashcards]
                 .sort(() => Math.random() - 0.5)
                 .map((c) => {
-                  const quizType = pickQuizType(c, prev)
+                  const quizType = pickQuizType(c, prev, learnedCases)
                   prev = quizType
                   return { ...c, quizType }
                 });
@@ -338,6 +350,7 @@ export default function Lesson() {
           type={card.quizType}
           card={card}
           flashcards={quizorder}
+          caseKeys={learnedCases}
           speakWord={speakWord}
           onNext={onQuizNext}
           onWrong={handleWrong}

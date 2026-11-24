@@ -14,7 +14,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, caseKeys,
   const answerKey = type === 'et-en' ? 'translation' : 'word'
   const caseInfo = useMemo(() => {
     if (type !== 'case') return null
-    const usable = CASES.filter((c) => QUIZ_CASES.includes(c.key) && card.cases?.[c.key])
+    const usable = CASES.filter((c) => (caseKeys ?? QUIZ_CASES).includes(c.key) && card.cases?.[c.key])
     return usable[Math.floor(Math.random() * usable.length)]
   }, [card, type])
 
