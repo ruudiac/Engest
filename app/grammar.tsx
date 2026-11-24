@@ -24,7 +24,7 @@ const inputStyle = {
 
 export default function Grammar() {
   const { moduleId, lessonId } = useLocalSearchParams();
-  const group = GRAMMAR[Number(lessonId)];
+  const group = GRAMMAR[`${moduleId}_${lessonId}`];
 
   const [lesson, setLesson] = useState<any>(null);
   const [items, setItems] = useState<any[]>([]); // practice questions
@@ -46,18 +46,32 @@ export default function Grammar() {
         .eq('lesson_number', Number(lessonId))
         .single();
 
-      // Practice: sentences for this lesson's cases, each with its card (for the forms)
-      const keys = l?.case_keys ?? [];
-      const { data: s } = await supabase
-        .from('sentences')
-        .select('*, cards(*)')
-        .in('case_key', keys);
+      let practice: any[] = [];
 
-      const practice = (s ?? [])
-        .filter((x: any) => x.cards?.cases)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, PRACTICE_SIZE)
-        .map((x: any) => ({ ...x.cards, sentences: [x], quizType: 'sentence' }));
+      if (l?.person_keys?.length) {
+        // Verb lesson: practise with verbs that have their forms saved
+        const { data: v } = await supabase
+          .from('cards')
+          .select('*')
+          .eq('word_type', 'pöördsõna')
+          .not('conjugations', 'is', null);
+        practice = (v ?? [])
+          .sort(() => Math.random() - 0.5)
+          .slice(0, PRACTICE_SIZE)
+          .map((c: any) => ({ ...c, quizType: 'verb' }));
+      } else {
+        // Case lesson: sentences for this lesson's cases, each with its card (for the forms)
+        const keys = l?.case_keys ?? [];
+        const { data: s } = await supabase
+          .from('sentences')
+          .select('*, cards(*)')
+          .in('case_key', keys);
+        practice = (s ?? [])
+          .filter((x: any) => x.cards?.cases)
+          .sort(() => Math.random() - 0.5)
+          .slice(0, PRACTICE_SIZE)
+          .map((x: any) => ({ ...x.cards, sentences: [x], quizType: 'sentence' }));
+      }
 
       await minTime;
       setLesson(l);
@@ -118,7 +132,7 @@ export default function Grammar() {
         card_id: item.id,
         module_id: Number(moduleId),
         lesson_number: Number(lessonId),
-        quiz_type: 'sentence',
+        quiz_type: item.quizType,
         case_key: caseKey ?? null,
         correct: wasCorrect,
         is_retry: !!item.retry,
@@ -192,7 +206,7 @@ export default function Grammar() {
         <>
           <ScrollView className="flex-1 mt-4" showsVerticalScrollIndicator={false}>
             <View className="bg-white rounded-3xl border border-[#EBD5F7] p-5">
-              <Text className="font-inter font-bold text-2xl text-[#543666] capitalize">{c.key}</Text>
+              <Text className="font-inter font-bold text-2xl text-[#543666]">{c.label ?? c.key}</Text>
               {info && (
                 <Text className="font-inter text-sm text-[#875BA1]">{info.q} · {info.qEn}</Text>
               )}
@@ -230,10 +244,11 @@ export default function Grammar() {
       {/* ---------- Practice ---------- */}
       {step === cases.length && items[index] && (
         <QuizMultipleChoice
-          type="sentence"
+          type={items[index].quizType}
           card={items[index]}
           flashcards={items}
           caseKeys={lesson.case_keys}
+          personKeys={lesson.person_keys}
           speakWord={() => {}}
           onNext={onPracticeNext}
         />

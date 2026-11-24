@@ -8,7 +8,7 @@ import { PERSONS, baseVerb, english } from './conjugationsModal';
 
 const QUIZ_CASES = ['sisseütlev', 'seesütlev', 'seestütlev', 'alaleütlev', 'alalütlev', 'alaltütlev', 'ilmaütlev', 'kaasaütlev'];
 
-export default function QuizMultipleChoice({ card, flashcards, onNext, caseKeys, speakWord, type = 'et-en', onWrong }: any) {
+export default function QuizMultipleChoice({ card, flashcards, onNext, onWrong, speakWord, caseKeys, personKeys, type = 'et-en' }: any) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
 
   const answerKey = type === 'et-en' ? 'translation' : 'word'
@@ -18,10 +18,14 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, caseKeys,
     return usable[Math.floor(Math.random() * usable.length)]
   }, [card, type])
 
-    // Pöörded quiz: one random person for this card (chosen once per card)
+  // Negation lesson: any person, and the answer is the "ei" form
+  const negative = type === 'verb' && personKeys?.includes('eitus')
+
+  // Pöörded quiz: one random person for this card (chosen once per card)
   const personInfo = useMemo(() => {
     if (type !== 'verb') return null
-    return PERSONS[Math.floor(Math.random() * PERSONS.length)]
+    const list = negative || !personKeys ? PERSONS : PERSONS.filter((p) => personKeys.includes(p.key))
+    return list[Math.floor(Math.random() * list.length)]
   }, [card, type])
     // Sentence quiz: one random sentence for this card (chosen once per card)
   const sentence = useMemo(() => {
@@ -36,7 +40,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, caseKeys,
   }
     const answer =
     type === 'case' ? card.cases[caseInfo!.key]
-    : type === 'verb' ? card.conjugations[personInfo!.key]
+    : type === 'verb' ? (negative ? card.conjugations.eitus : card.conjugations[personInfo!.key])
     : type === 'sentence' ? fit(card.cases[sentence!.case_key])
     : card[answerKey]
 
@@ -45,7 +49,11 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, caseKeys,
         // Case/verb quiz: other forms of the same word. Otherwise: answers from other cards.
      const pool =
       type === 'case' ? Object.values(card.cases)
-      : type === 'verb' ? PERSONS.map((p) => card.conjugations[p.key])
+      : type === 'verb'
+        ? negative
+          // typical mistakes: keeping the ending after "ei"
+          ? [card.conjugations.eitus, `ei ${card.conjugations.ma}`, `ei ${card.conjugations.ta}`, `ei ${card.conjugations.nad}`]
+          : (personKeys ? PERSONS.filter((p) => personKeys.includes(p.key)) : PERSONS).map((p) => card.conjugations[p.key])
       : type === 'sentence' ? (caseKeys ?? QUIZ_CASES).map((k: string) => card.cases[k]).filter(Boolean).map(fit)
       : flashcards.map((f: any) => f[answerKey])
 
@@ -68,7 +76,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, caseKeys,
     : card.word
   const revealMeaning =
     type === 'case' ? `"${caseInfo!.en.replaceAll('___', card.translation.split('/')[0].trim().toLowerCase())}"`
-    : type === 'verb' ? english(baseVerb(card.translation), personInfo!)
+    : type === 'verb' ? `${negative ? 'not: ' : ''}${english(baseVerb(card.translation), personInfo!)}`
     : type === 'sentence' ? sentence!.en
     : card.translation
 
@@ -155,6 +163,9 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, caseKeys,
                 <Text className="font-inter text-base text-[#875BA1] text-center">Which form fits?</Text>
                 <Text className="font-bold text-4xl text-[#543666] font-inter text-center mt-3">
                   {personInfo!.key} ___
+                <Text className="font-inter text-sm text-[#875BA1] text-center mt-3">
+                  {card.word.toLowerCase()} · {negative ? 'not: ' : ''}{english(baseVerb(card.translation), personInfo!)}
+                </Text>
                 </Text>
                 <Text className="font-inter text-sm text-[#875BA1] text-center mt-3">
                   {card.word.toLowerCase()} · {english(baseVerb(card.translation), personInfo!)}
@@ -204,7 +215,7 @@ export default function QuizMultipleChoice({ card, flashcards, onNext, caseKeys,
       <Pressable
         onPress={() => {
           setSelectedAnswer(null)
-         onNext(isCorrect, caseInfo?.key ?? personInfo?.key ?? sentence?.case_key)
+          onNext(isCorrect, caseInfo?.key ?? (negative ? 'eitus' : personInfo?.key) ?? sentence?.case_key)
         }}
         disabled={!selectedAnswer}
         className='h-14 mt-5 mb-2 rounded-2xl flex-row items-center justify-center gap-2 bg-[#543666]'

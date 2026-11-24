@@ -1,5 +1,5 @@
-// Content for the Käänded (cases) module.
-// One group per grammar lesson, matched by lesson_number.
+// Content for the grammar modules (Käänded and Pöörded).
+// One group per grammar lesson, found by "moduleId_lessonNumber", e.g. GRAMMAR['7_1'].
 // In example sentences, **word** marks the case form; the screen highlights it.
 
 export type GrammarExample = {
@@ -8,7 +8,8 @@ export type GrammarExample = {
 };
 
 export type GrammarCase = {
-  key: string;      // must match a key in CASES (casesModal.tsx)
+  key: string;      // a key in CASES (casesModal.tsx), or a person key for verbs (ma, sa, ta, me, te, nad, eitus)
+  label?: string;   // optional heading instead of the key (used for verbs)
   ending: string;   // the typical ending, shown big
   explain: string;  // plain-English explanation
   examples: GrammarExample[];
@@ -20,8 +21,8 @@ export type GrammarGroup = {
   cases: GrammarCase[];
 };
 
-export const GRAMMAR: Record<number, GrammarGroup> = {
-  1: {
+export const GRAMMAR: Record<string, GrammarGroup> = {
+  '7_1': {
     title: 'Inside: into, in, out of',
     intro:
       'In Estonian, little words like "into", "in" and "out of" become endings on the word itself. ' +
@@ -61,7 +62,7 @@ export const GRAMMAR: Record<number, GrammarGroup> = {
     ],
   },
 
-  2: {
+  '7_2': {
     title: 'On the surface: onto, on, off',
     intro:
       'These three work like the "inside" cases, but for surfaces and people: ' +
@@ -100,7 +101,7 @@ export const GRAMMAR: Record<number, GrammarGroup> = {
     ],
   },
 
-  3: {
+  '7_3': {
     title: 'With and without',
     intro:
       'Two easy ones: "with" and "without" are just endings. ' +
@@ -127,7 +128,7 @@ export const GRAMMAR: Record<number, GrammarGroup> = {
     ],
   },
 
-  4: {
+  '7_4': {
     title: "Of, 's, and some",
     intro:
       'These two are the most important cases in Estonian, and the trickiest. ' +
@@ -159,7 +160,7 @@ export const GRAMMAR: Record<number, GrammarGroup> = {
     ],
   },
 
-  5: {
+  '7_5': {
     title: 'Becomes, as, until',
     intro:
       'Three cases for changes and limits: becoming something, being something for a while, ' +
@@ -190,6 +191,110 @@ export const GRAMMAR: Record<number, GrammarGroup> = {
         examples: [
           { et: 'Ma jalutan **jõeni**.', en: 'I walk as far as the river.' },
           { et: 'Pood on lahti **kella kaheni**.', en: 'The shop is open until two.' },
+        ],
+      },
+    ],
+  },
+  // ---------- Pöörded (verbs), module 8 ----------
+  '8_1': {
+    title: 'I, you, he and she',
+    intro:
+      'Estonian verbs change their ending depending on WHO is doing something. ' +
+      'The good news: the endings are very regular. We start with one person at a time: I, you and he or she. ' +
+      'Estonian has no "he" or "she", ta means both!',
+    cases: [
+      {
+        key: 'ma',
+        label: 'ma · I',
+        ending: '-n',
+        explain:
+          'For yourself, add -n. The middle of the word sometimes changes a little (õppima becomes õpin), ' +
+          "so check each verb's Pöörded sheet.",
+        examples: [
+          { et: 'Ma **õpin** eesti keelt.', en: "I'm learning Estonian." },
+          { et: 'Ma **maksan** kaardiga.', en: 'I pay by card.' },
+        ],
+      },
+      {
+        key: 'sa',
+        label: 'sa · you',
+        ending: '-d',
+        explain: 'Talking to one person you know well: add -d.',
+        examples: [
+          { et: 'Kas sa **õpid** eesti keelt?', en: 'Are you learning Estonian?' },
+          { et: 'Sa **kirjutad** väga hästi.', en: 'You write very well.' },
+        ],
+      },
+      {
+        key: 'ta',
+        label: 'ta · he, she',
+        ending: '-b',
+        explain: 'Talking about one other person: add -b. The same form for he and she.',
+        examples: [
+          { et: 'Ta **vastab** kohe.', en: 'She answers right away.' },
+          { et: 'Ta **hilineb** alati.', en: 'He is always late.' },
+        ],
+      },
+    ],
+  },
+
+  '8_2': {
+    title: 'We, you all, they',
+    intro:
+      'Now the plural: we, you (more than one person, or polite) and they. ' +
+      'These endings are just as regular as the first three.',
+    cases: [
+      {
+        key: 'me',
+        label: 'me · we',
+        ending: '-me',
+        explain: 'For a group that includes you: add -me.',
+        examples: [
+          { et: 'Me **alustame** kell üheksa.', en: 'We start at nine.' },
+          { et: 'Me **maksame** koos.', en: 'We pay together.' },
+        ],
+      },
+      {
+        key: 'te',
+        label: 'te · you (all)',
+        ending: '-te',
+        explain:
+          'For several people, or one person you want to be polite to (like a stranger or a boss): add -te.',
+        examples: [
+          { et: 'Kas te **räägite** inglise keelt?', en: 'Do you speak English?' },
+          { et: 'Te **kirjutate** kiiresti.', en: 'You write fast.' },
+        ],
+      },
+      {
+        key: 'nad',
+        label: 'nad · they',
+        ending: '-vad',
+        explain: 'Talking about several other people: add -vad.',
+        examples: [
+          { et: 'Nad **õpivad** ülikoolis.', en: 'They study at university.' },
+          { et: 'Nad **hilinevad** jälle.', en: 'They are late again.' },
+        ],
+      },
+    ],
+  },
+
+  '8_3': {
+    title: 'Saying no',
+    intro:
+      'Here is the easiest grammar rule in Estonian: to say "not", put ei in front of the verb ' +
+      'and drop the ending. It is the same for every person.',
+    cases: [
+      {
+        key: 'eitus',
+        label: 'ei · not',
+        ending: 'ei ...',
+        explain:
+          'ei + the verb with no ending: ma ei õpi, sa ei õpi, nad ei õpi. ' +
+          'No -n, -d or -b after ei!',
+        examples: [
+          { et: 'Ma **ei õpi** täna.', en: "I'm not studying today." },
+          { et: 'Ta **ei vasta**.', en: "She isn't answering." },
+          { et: 'Nad **ei maksa** sularahas.', en: "They don't pay in cash." },
         ],
       },
     ],
