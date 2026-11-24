@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import { Pressable, Text, View, Image } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Pressable, Text, View, Image } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import CasesModal from './casesModal';
 import { wordStyle, translationStyle, soundStyle } from './wordSize';
@@ -38,6 +38,36 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
 
   // Which forms button this word gets: Pöörded for verbs, Käänded for words with cases, none otherwise
   const formsLabel = isVerb ? 'Pöörded' : card.cases ? 'Käänded' : null;
+
+    // Has this learner ever opened the forms? Saved on the phone, so it survives restarts.
+  const [seenForms, setSeenForms] = useState(() => {
+    try { return localStorage.getItem('seenForms') === '1'; } catch { return false; }
+  });
+
+  // Gentle pulse on the forms button until the learner has opened it once
+  const pulse = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (!formsLabel || seenForms) {
+      pulse.setValue(1);
+      return;
+    }
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1.06, duration: 700, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1, duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [formsLabel, seenForms]);
+
+  const openForms = () => {
+    setCasesOpen(true);
+    if (!seenForms) {
+      setSeenForms(true);
+      try { localStorage.setItem('seenForms', '1'); } catch {}
+    }
+  };
   
   return (
     <View className='flex-1'> 
@@ -74,20 +104,30 @@ export default function FlashcardMode({ card, currentIndex, flashcards, speakWor
           {type.et} · {type.en}
         </Text>
       )}
-              {formsLabel && (
-        <Pressable onPress={() => setCasesOpen(!casesOpen)}
-          className={`flex-row items-center self-center mt-4 px-5 py-2 rounded-full gap-2 ${
-            casesOpen ? 'bg-[#543666]' : 'bg-[#F6E9FF]'
-          }`}>
-          <Text className={`text-base font-semibold font-inter ${
-            casesOpen ? 'text-[#F6E9FF]' : 'text-[#7F39A6]'}`}>
-            {formsLabel}
-          </Text>
-          <Ionicons
-            name={casesOpen ? 'chevron-up' : 'chevron-down'}
-            size={16}
-            color={casesOpen ? '#F6E9FF' : '#7F39A6'}/>
-        </Pressable>
+                    {formsLabel && (
+        <View className="items-center mt-4">
+          {/* Hint, only until the forms have been opened once */}
+          {!seenForms && (
+            <View className="rounded-xl bg-white px-3 py-1 mb-2">
+              <Text className="font-inter text-xs text-[#543666]">Tap to see all forms of this word</Text>
+            </View>
+          )}
+
+          <Animated.View style={{ transform: [{ scale: pulse }] }}>
+            <Pressable
+              onPress={openForms}
+              className="flex-row items-center gap-3 rounded-2xl bg-[#543666] px-5 py-3"
+              style={inputStyle}
+            >
+              <Ionicons name="grid" size={20} color="#F6E9FF" />
+              <View>
+                <Text className="font-inter font-semibold text-base text-white">How this word changes</Text>
+                <Text className="font-inter text-xs text-[#CF8DF5]">{formsLabel}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#F6E9FF" />
+            </Pressable>
+          </Animated.View>
+        </View>
       )}
     </View>
     

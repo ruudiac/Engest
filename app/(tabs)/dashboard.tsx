@@ -227,7 +227,7 @@ const isUnlocked = (index: number) => {
       <HelpButton
         titleEt="Südamed"
         titleEn="Hearts"
-        text="You lose a heart for each first wrong answer in a quiz. A new heart comes back every 30 minutes."/>
+        text="Finish a quiz with less than 70% right on the first try and you lose one heart. A new heart comes back every 30 minutes."/>
     </View>
   </View>
 

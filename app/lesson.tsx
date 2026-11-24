@@ -15,6 +15,7 @@ import LoadingScreen from "../components/loadingScreen";
 import { getHardWords } from "../lib/hardWords";
 import { niceAlert } from "../components/niceAlert";
 import { getLearnedCases } from "../lib/learnedCases";
+import Highlight from "../components/highlight";
 
 // Picks a random quiz type that this card can actually support
 const pickQuizType = (c: any, prev: string, learned: string[]) => {
@@ -37,6 +38,7 @@ export default function Lesson() {
   const [loading, setLoading] = useState(true);
   const [hearts, setHearts] = useState(MAX_HEARTS);
   const [learnedCases, setLearnedCases] = useState<string[]>([]);
+  const [showIntro, setShowIntro] = useState(true);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mode, setMode] = useState("flashcard");
@@ -168,18 +170,11 @@ export default function Lesson() {
   };
 
 
-  const handleWrong = async () => {
+  // Called the moment a wrong answer is tapped: only counts first-try mistakes.
+  // Hearts are decided at the end of the quiz, from the score.
+  const handleWrong = () => {
     if (card.retry || isReview) return;
     setMistakes(mistakes + 1);
-    const left = await loseHeart();
-    setHearts(left);
-    if (left === 0) {
-      niceAlert(
-        "Südamed otsas!",
-        "You're out of hearts. Come back in 30 minutes.",
-        [{ text: "OK", onPress: () => router.replace("/(tabs)/dashboard" as any) }],
-      );
-    }
   };
 
   const onQuizNext = async (wasCorrect: boolean, caseKey?: string) => {
@@ -220,16 +215,31 @@ export default function Lesson() {
         );
         return;
       }
-      router.push({
-        pathname: "/complete",
-        params: {
-          mistakes: String(mistakes),
-          total: String(flashcards.length),
-          lessonId: String(lesson.lesson_number),
-          moduleId: String(moduleId),
-          moduleName: lesson.name,
-        },
-      });
+      const goComplete = () =>
+        router.push({
+          pathname: "/complete",
+          params: {
+            mistakes: String(mistakes),
+            total: String(flashcards.length),
+            lessonId: String(lesson.lesson_number),
+            moduleId: String(moduleId),
+            moduleName: lesson.name,
+          },
+        });
+
+      // One heart per failed quiz: under 70% right on the first try
+      const score = Math.round(((flashcards.length - mistakes) / flashcards.length) * 100);
+      if (score < 70) {
+        const left = await loseHeart();
+        setHearts(left);
+        niceAlert(
+          "Üks süda läks",
+          `You got ${score}% right on the first try. Under 70% costs one heart. Keep practising and you'll get it!`,
+          [{ text: "OK", onPress: goComplete }],
+        );
+        return;
+      }
+      goComplete();
     } else {
       setCurrentIndex(currentIndex + 1);
     }
@@ -284,6 +294,50 @@ export default function Lesson() {
   }
   if (!card) {
     return <LoadingScreen />;
+  }
+    // "Hea teada" intro before the flashcards (only when the lesson has one)
+  if (showIntro && lesson.intro && mode === "flashcard" && !isReview) {
+    return (
+      <SafeAreaView className="flex-1 bg-[#F1D4FF] px-6">
+        <Pressable
+          onPress={() => router.back()}
+          className="self-start rounded-full bg-[#E2BFF6] border border-[#543666] px-2 py-2"
+          style={inputStyle}
+        >
+          <Ionicons name="caret-back" size={24} color="#7F39A6" />
+        </Pressable>
+
+        <Text className="text-center text-3xl font-bold font-inter pt-4 text-[#543666]">{lesson.name}</Text>
+        <Text className="text-center font-inter text-base text-[#875BA1]">
+          Lesson {lesson.lesson_number} · {lesson.subtitle}
+        </Text>
+
+        <View className="flex-1 justify-center">
+          <View className="bg-white rounded-3xl border border-[#EBD5F7] p-5" style={cardStyle}>
+            <Text className="font-inter font-bold text-xs tracking-widest text-[#875BA1] mb-2">IN THIS LESSON</Text>
+            <Text className="font-inter text-base text-[#543666] mb-3">{flashcards.length} words, including:</Text>
+            <View className="flex-row flex-wrap gap-2 mb-5">
+              {flashcards.slice(0, 4).map((c) => (
+                <View key={c.id} className="rounded-full bg-[#F3E6FA] px-3 py-1">
+                  <Text className="font-inter font-semibold text-sm text-[#543666]">{c.word}</Text>
+                </View>
+              ))}
+            </View>
+
+            <Text className="font-inter font-bold text-xs tracking-widest text-[#875BA1] mb-2">HEA TEADA · GOOD TO KNOW</Text>
+            <Highlight text={lesson.intro} size="text-base" />
+          </View>
+        </View>
+
+        <Pressable
+          onPress={() => setShowIntro(false)}
+          className="h-14 mb-4 rounded-2xl flex-row items-center justify-center gap-2 bg-[#543666]"
+        >
+          <Text className="font-inter font-semibold text-lg text-white">Start</Text>
+          <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+        </Pressable>
+      </SafeAreaView>
+    );
   }
 
   return (

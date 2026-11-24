@@ -8,6 +8,7 @@ import LoadingScreen from '../components/loadingScreen';
 import QuizMultipleChoice from '../components/quizMultipleChoice';
 import { GRAMMAR } from '../lib/grammar';
 import { supabase } from '../lib/supabase';
+import Highlight from '../components/highlight';
 
 const PRACTICE_SIZE = 8; // how many sentences in the practice part
 
@@ -19,20 +20,7 @@ const inputStyle = {
   elevation: 4,
 };
 
-// Shows a sentence with the **marked** word highlighted
-function Highlight({ text }: { text: string }) {
-  return (
-    <Text className="font-inter text-lg text-[#543666]">
-      {text.split('**').map((part, i) =>
-        i % 2 === 1 ? (
-          <Text key={i} className="font-bold text-[#7F39A6]">{part}</Text>
-        ) : (
-          part
-        ),
-      )}
-    </Text>
-  );
-}
+
 
 export default function Grammar() {
   const { moduleId, lessonId } = useLocalSearchParams();
